@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="PALABRA">
-<link rel="manifest" href="./manifest.json">
+<link rel="manifest" href="./manifest.json?v=20261122-cn3">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="./icon.svg">
 <title>PALABRA · 西班牙语词汇</title>
@@ -45,7 +45,7 @@ footer{text-align:center;color:#9ca398;font-size:10px;line-height:1.7;margin-top
  <div class="header-state" id="loadState">正在加载词库…</div>
 </header>
 <section class="hero">
- <div><div class="eyebrow">Tu camino al español</div><h1>从 A1 到 B2<br>一步步学好西班牙语</h1><p class="intro">西班牙语原词搭配中文释义，按等级积累词汇。测验、查词、收藏和错题记录会保存在这台设备上。</p></div>
+ <div><div class="eyebrow">西班牙语学习计划</div><h1>从 A1 到 B2<br>一步步学好西班牙语</h1><p class="intro">西班牙语原词搭配中文释义，按等级积累词汇。测验、查词、收藏和错题记录会保存在这台设备上。</p></div>
 </section>
 <div class="metrics">
  <div class="metric"><strong id="totalCount">—</strong><span>词库词条</span></div>
@@ -62,7 +62,7 @@ footer{text-align:center;color:#9ca398;font-size:10px;line-height:1.7;margin-top
 </nav>
 <section id="learnSection" class="section">
  <div class="panel">
-  <div class="panel-head"><div class="panel-title">词汇测验</div><div class="level-pill" id="levelBadge">A1 · BEGINNER</div></div>
+  <div class="panel-head"><div class="panel-title">词汇测验</div><div class="level-pill" id="levelBadge">A1 · 入门</div></div>
   <div class="controls">
    <select id="levelSelect" aria-label="西语等级"><option value="ALL">全部等级</option><option value="A1">A1 · 入门</option><option value="A2">A2 · 初级</option><option value="B1">B1 · 中级</option><option value="B2">B2 · 中高级</option></select>
    <select id="directionSelect" aria-label="测验方向"><option value="es-zh">西班牙语 → 中文释义</option><option value="zh-es">中文释义 → 西班牙语</option></select>
@@ -76,19 +76,19 @@ footer{text-align:center;color:#9ca398;font-size:10px;line-height:1.7;margin-top
   <div class="options" id="options"><div class="loading">正在准备题目…</div></div>
   <div class="feedback" id="feedback" aria-live="polite"></div>
   <div class="actions">
-   <div class="progress-copy" id="progressCopy">7,000 vocabulary entries</div>
-   <button class="primary" id="nextButton" disabled>下一题 · Next →</button>
+   <div class="progress-copy" id="progressCopy">词库共 7,468 个词条</div>
+   <button class="primary" id="nextButton" disabled>下一题 →</button>
   </div>
   <div class="actions">
    <button class="subtle" id="favoriteCurrent">☆ 收藏这个词</button>
    <button class="subtle" id="speakCurrent">🔊 听发音</button>
   </div>
-  <div class="notice">测验只从本地已有中文释义的词条中出题，避免因在线翻译失败出现空白选项。部分词条仍可能缺少中文释义；缺失内容不会伪造，后续需要逐批补齐并保存到词库中。</div>
+  <div class="notice">词条释义优先使用本地词库；没有中文释义时，会尝试查询中文词典及在线翻译，并自动保存在这台设备。首次查询需要联网，已保存的释义之后可离线查看。</div>
  </div>
 </section>
 <section id="dictionarySection" class="section hidden">
  <div class="panel">
-  <div class="panel-head"><div class="panel-title">查找西班牙语词汇</div><div class="level-pill" id="dictionaryCount">7,000 个词条</div></div>
+  <div class="panel-head"><div class="panel-title">查找西班牙语词汇</div><div class="level-pill" id="dictionaryCount">7,468 个词条</div></div>
   <div class="toolbar">
    <input class="search" id="searchInput" placeholder="搜索西班牙语或中文…" autocomplete="off">
    <select id="dictLevel"><option value="ALL">全部等级</option><option value="A1">A1</option><option value="A2">A2</option><option value="B1">B1</option><option value="B2">B2</option></select>
@@ -101,10 +101,10 @@ footer{text-align:center;color:#9ca398;font-size:10px;line-height:1.7;margin-top
  </div>
 </section>
 <section id="favoritesSection" class="section hidden">
- <div class="panel"><div class="panel-head"><div class="panel-title">我的收藏</div><div class="level-pill" id="favoriteCount">0 SAVED</div></div><div class="word-list" id="favoritesList"></div></div>
+ <div class="panel"><div class="panel-head"><div class="panel-title">我的收藏</div><div class="level-pill" id="favoriteCount">已收藏 0 个</div></div><div class="word-list" id="favoritesList"></div></div>
 </section>
 <section id="mistakesSection" class="section hidden">
- <div class="panel"><div class="panel-head"><div class="panel-title">我的错题</div><div class="level-pill" id="mistakeCount">0 TO REVIEW</div></div><div class="word-list" id="mistakesList"></div></div>
+ <div class="panel"><div class="panel-head"><div class="panel-title">我的错题</div><div class="level-pill" id="mistakeCount">待复习 0 个</div></div><div class="word-list" id="mistakesList"></div></div>
 </section>
 <section id="reviewSection" class="section hidden">
  <div class="panel">
@@ -163,23 +163,30 @@ function updateStats(){
  $("masteredCount").textContent=store.known.length.toLocaleString("zh-CN");
  $("dueCount").textContent=dueReviewWords().length.toLocaleString("zh-CN");
  $("todayCount").textContent=(store.daily[todayKey]||0).toLocaleString("zh-CN");
- $("favoriteCount").textContent=store.favorites.length+" SAVED";
- $("mistakeCount").textContent=store.mistakes.length+" TO REVIEW";
+ $("favoriteCount").textContent="已收藏 "+store.favorites.length+" 个";
+ $("mistakeCount").textContent="待复习 "+store.mistakes.length+" 个";
 }
 function posLabel(pos){
- const m={noun:"名词 · noun",verb:"动词 · verb",adjective:"形容词 · adjective",adverb:"副词 · adverb",pronoun:"代词 · pronoun",determiner:"限定词",conjunction:"连词",preposition:"介词",interjection:"感叹词",participle:"分词",phrase:"短语 · phrase",contraction:"缩合形式",other:"其他词类"};
- return m[pos]||pos||"词性未标注";
+ const key=String(pos||"").trim().toLowerCase();
+ const m={
+  noun:"名词",verb:"动词",adjective:"形容词",adj:"形容词",adverb:"副词",adv:"副词",
+  pronoun:"代词",pron:"代词",determiner:"限定词",conjunction:"连词",preposition:"介词",
+  interjection:"感叹词",interj:"感叹词",participle:"分词",phrase:"短语",contraction:"缩合形式",
+  "proper noun":"专有名词",article:"冠词",unknown:"其他词类"
+ };
+ return m[key]||"词性未标注";
 }
+
 function levelWords(){
  const l=$("levelSelect").value;
  return l==="ALL"?words:words.filter(w=>w.level===l);
 }
 async function loadVocab(){
  try{
-  const files=await Promise.all(LEVELS.map(l=>fetch("./data/"+l.toLowerCase()+".json",{cache:"no-cache"}).then(r=>{if(!r.ok)throw new Error("Failed loading "+l);return r.json()})));
-  words=files.flat();wordByEs=new Map(words.map(w=>[exactKey(w.es),w]));
+  const files=await Promise.all(LEVELS.map(l=>fetch("./data/"+l.toLowerCase()+".json?v=20261122-cn3",{cache:"no-store"}).then(r=>{if(!r.ok)throw new Error("词库文件加载失败："+l);return r.json()})));
+  words=files.flat().filter(w=>w&&w.es);const unique=new Map();words.forEach(w=>{const k=exactKey(w.es);if(!unique.has(k))unique.set(k,w)});words=[...unique.values()];wordByEs=new Map(words.map(w=>[exactKey(w.es),w]));
   words.sort((a,b)=>a.level.localeCompare(b.level)||a.es.localeCompare(b.es,"es"));
-  $("loadState").textContent=words.length.toLocaleString("zh-CN")+" words loaded";
+  $("loadState").textContent="已加载 "+words.length.toLocaleString("zh-CN")+" 个词条";
   $("dictionaryCount").textContent=words.length.toLocaleString("zh-CN")+" 个词条";
   updateStats();renderSaved();renderReview();renderDictionary();newQuestion();
  }catch(err){
@@ -205,50 +212,50 @@ async function translateExample(w){
   store.translationCache[key]=result;save();return result;
  }catch(e){return ""}
 }
-async function wiktionaryMeaning(w,target){
- const edition=target==="zh"?"zh":"en";
- const url="https://api.wiktapi.dev/v1/"+edition+"/word/"+encodeURIComponent(w.es)+"?lang=es";
+async function wiktionaryMeaning(w){
+ const url="https://api.wiktapi.dev/v1/zh/word/"+encodeURIComponent(w.es)+"?lang=es";
  try{
   const response=await fetch(url);
-  if(!response.ok)throw new Error("Wiktionary lookup unavailable");
+  if(!response.ok)throw new Error("中文词典查询失败");
   const data=await response.json();
   const entries=(data.entries||[]).filter(e=>e.lang_code==="es"||(e.lang||"").toLowerCase()==="spanish");
   const glosses=[];
   entries.forEach(e=>(e.senses||[]).forEach(s=>(s.glosses||[]).forEach(g=>{
-   const value=String(g||"").trim();if(value&&!glosses.includes(value))glosses.push(value);
+   const value=String(g||"").trim();
+   if(value&&/[\u3400-\u9fff]/.test(value)&&!glosses.includes(value))glosses.push(value);
   })));
-  return glosses.slice(0,5).join("; ");
+  return glosses.slice(0,5).join("；");
  }catch(e){return ""}
 }
-async function translateWord(w,target){
- const key=cacheKey(w.es,target);
+const translationPromises=new Map();
+async function translateWord(w){
+ const key=cacheKey(w.es,"zh");
+ if(w.zh)return w.zh;
  if(store.translationCache[key])return store.translationCache[key];
- if(target==="zh"&&w.zh)return w.zh;
- if(target==="en"&&w.en)return w.en;
- const wiktionary=await wiktionaryMeaning(w,target);
- if(wiktionary){
-  store.translationCache[key]=wiktionary;save();return wiktionary;
- }
- let q=w.es,pair=target==="zh"?"es|zh-CN":"es|en";
- if(target==="zh"&&w.en){q=w.en;pair="en|zh-CN"}
- try{
-  const url="https://api.mymemory.translated.net/get?q="+encodeURIComponent(q)+"&langpair="+encodeURIComponent(pair);
-  const response=await fetch(url);
-  if(!response.ok)throw new Error("Translation service unavailable");
-  const data=await response.json();
-  if(data.responseStatus&&data.responseStatus!==200)throw new Error("Translation quota or provider error");
-  const result=String(data.responseData&&data.responseData.translatedText||"").replace(/&quot;/g,'"').replace(/&#39;/g,"'").trim();
-  if(!result||result.toLowerCase()===q.toLowerCase()&&target==="zh")throw new Error("No translation available");
-  store.translationCache[key]=result;save();return result;
- }catch(e){
-  const fallback=target==="zh"?(w.zh||"释义暂不可用"):(w.en||"Meaning unavailable");
-  return fallback;
- }
+ if(translationPromises.has(key))return translationPromises.get(key);
+ const task=(async()=>{
+  let result=await wiktionaryMeaning(w);
+  if(!result){
+   try{
+    const url="https://api.mymemory.translated.net/get?q="+encodeURIComponent(w.es)+"&langpair="+encodeURIComponent("es|zh-CN");
+    const response=await fetch(url);
+    if(!response.ok)throw new Error("中文翻译查询失败");
+    const data=await response.json();
+    if(data.responseStatus&&data.responseStatus!==200)throw new Error("中文翻译服务暂不可用");
+    const candidate=String(data.responseData&&data.responseData.translatedText||"").replace(/&quot;/g,'"').replace(/&#39;/g,"'").trim();
+    if(/[\u3400-\u9fff]/.test(candidate))result=candidate;
+   }catch(e){}
+  }
+  if(result){store.translationCache[key]=result;save();}
+  return result||"";
+ })();
+ translationPromises.set(key,task);
+ try{return await task;}finally{translationPromises.delete(key);}
 }
-function storedMeaning(w,target){
- if(target==="zh")return w.zh||store.translationCache[cacheKey(w.es,"zh")]||"";
- return w.en||store.translationCache[cacheKey(w.es,"en")]||"";
+function storedMeaning(w){
+ return w.zh||store.translationCache[cacheKey(w.es,"zh")]||"";
 }
+
 function setTab(tab){
  document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));
  ["learn","dictionary","favorites","mistakes","review"].forEach(name=>$(name+"Section").classList.toggle("hidden",name!==tab));
@@ -257,15 +264,12 @@ function setTab(tab){
  if(tab==="review")renderReview();
 }
 document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>setTab(b.dataset.tab)));
-function quizGloss(w,target){
- const cached=store.translationCache[cacheKey(w.es,target)]||"";
- return target==="zh"?(w.zh||cached):(w.en||cached);
-}
-function eligibleWords(pool,target){
- return pool.filter(w=>Boolean(quizGloss(w,target)));
+function quizGloss(w){
+ return storedMeaning(w);
 }
 function currentQuizTarget(){ return "zh"; }
 function quizDirectionsAreReverse(){ return $("directionSelect").value==="zh-es"; }
+
 function renderQuizUnavailable(message){
  $("options").innerHTML="<div class='empty'>"+escapeHtml(message)+"</div>";
  $("nextButton").disabled= !current;
@@ -288,19 +292,16 @@ async function newQuestion(){
  $("feedback").className="feedback";
  $("feedback").innerHTML="";
  const selectedLevelPool=levelWords();
- const target=currentQuizTarget();
- const targetLabel="中文";
+ if(!selectedLevelPool.length)return;
  const reverse=quizDirectionsAreReverse();
- const pool=eligibleWords(selectedLevelPool,target);
  if(reviewMode){
-  reviewQueue=reviewQueue.filter(w=>Boolean(quizGloss(w,target)));
   if(!reviewQueue.length){
    reviewMode=false;current=null;
    $("promptLabel").textContent="今日复习已完成";
-   $("questionWord").textContent="¡Muy bien!";
-   $("questionIPA").textContent="今天到期且有"+targetLabel+"释义的词已经复习完毕。";
+   $("questionWord").textContent="做得好！";
+   $("questionIPA").textContent="今天安排的复习已经完成。";
    $("questionPOS").textContent="";
-   $("options").innerHTML="<div class='empty'>你可以继续普通测验，或者明天再来复习新到期的词。</div>";
+   $("options").innerHTML="<div class='empty'>你可以继续普通测验，或明天再来复习。</div>";
    $("feedback").className="feedback";
    $("nextButton").disabled=true;
    $("progressCopy").textContent="今日复习完成";
@@ -309,53 +310,58 @@ async function newQuestion(){
   }
   current=reviewQueue.shift();
  }else{
-  if(!pool.length){
-   current=null;
-   $("questionWord").textContent="暂时没有可测词条";
-   $("questionIPA").textContent="";
-   $("questionPOS").textContent="";
-   $("promptLabel").textContent="当前等级的本地"+targetLabel+"释义不足";
-   renderQuizUnavailable("这个等级目前没有足够的本地"+targetLabel+"释义可供测验。请切换其他等级。测验只使用已有中文释义，不会逐题调用外部翻译服务。");
-   return;
-  }
-  current=pool[Math.floor(Math.random()*pool.length)];
+  current=shuffle(selectedLevelPool)[0];
  }
  $("levelBadge").textContent=current.level+" · "+({A1:"入门",A2:"初级",B1:"中级",B2:"中高级"}[current.level]);
- const dir=$("directionSelect").value;
- $("promptLabel").textContent=dir==="es-zh"?"请选择正确的中文释义":"根据中文释义选择西班牙语";
- const meaning=quizGloss(current,target);
- $("questionWord").textContent=reverse?meaning:current.es;
+ $("promptLabel").textContent=reverse?"根据中文释义选择对应的西班牙语":"请选择这个西班牙语单词的中文释义";
+ $("questionWord").textContent=current.es;
  $("questionIPA").textContent=current.ipa||"";
  $("questionPOS").textContent=posLabel(current.pos);
- const available=reviewMode?eligibleWords(words.filter(w=>w.level===current.level),target):pool;
- const otherPool=shuffle(available.filter(w=>w.id!==current.id));
- const candidates=[current,...otherPool.slice(0,3)];
+ $("options").innerHTML="<div class='loading'>正在查找中文释义并准备选项…</div>";
+ $("progressCopy").textContent="正在准备中文题目…";
+ let currentZh=quizGloss(current);
+ if(!currentZh)currentZh=await translateWord(current);
+ if(!currentZh){
+  $("options").innerHTML="<div class='empty'>暂时没有查到这个词的中文释义。请点击“下一题”更换词条，或稍后重试。</div>";
+  $("progressCopy").textContent="中文释义暂不可用";
+  $("nextButton").disabled=false;
+  $("favoriteCurrent").textContent=store.favorites.includes(current.es)?"★ 已收藏":"☆ 收藏这个词";
+  return;
+ }
+ $("questionWord").textContent=reverse?currentZh:current.es;
+ const otherPool=shuffle(selectedLevelPool.filter(w=>w.id!==current.id));
+ if(!reverse){
+  const uncached=otherPool.filter(w=>!quizGloss(w)).slice(0,6);
+  await Promise.all(uncached.map(w=>translateWord(w)));
+ }
  const seen=new Set();
  const uniqueRows=[];
+ const candidates=[current,...otherPool];
  candidates.forEach(w=>{
-  const value=reverse?w.es:quizGloss(w,target);
+  const value=reverse?w.es:quizGloss(w);
   const key=exactKey(value);
   if(value&&!seen.has(key)){
    seen.add(key);
    uniqueRows.push({w,text:value});
   }
  });
- if(uniqueRows.length<2){
-  $("options").innerHTML="<div class='empty'>当前等级可用的本地释义较少，无法组成可靠的选择题。请换一个等级或测验方向。</div>";
+ const options=shuffle(uniqueRows).slice(0,4);
+ if(!options.some(x=>x.w.id===current.id))options[0]={w:current,text:reverse?current.es:currentZh};
+ if(options.length<2){
+  $("options").innerHTML="<div class='empty'>可用的中文释义不足，暂时无法组成可靠的选择题。请切换等级或稍后再试。</div>";
+  $("progressCopy").textContent="中文释义数量不足";
   $("nextButton").disabled=false;
-  $("progressCopy").textContent="释义覆盖不足 · 可以跳过";
-  $("favoriteCurrent").textContent=store.favorites.includes(current.es)?"★ 已收藏":"☆ 收藏这个词";
   return;
  }
  $("options").innerHTML="";
- uniqueRows.forEach(x=>{
+ options.forEach(x=>{
   const b=document.createElement("button");
   b.className="option";
   b.textContent=x.text;
   b.addEventListener("click",()=>answerQuestion(x.w,b,x.text));
   $("options").appendChild(b);
  });
- $("progressCopy").textContent=reviewMode?"今日复习 · "+reviewQueue.length+" 题剩余":"第 "+questionIndex+" 题 · 本地已有中文释义的词汇";
+ $("progressCopy").textContent=reviewMode?"今日复习 · 剩余 "+reviewQueue.length+" 题":"第 "+questionIndex+" 题";
  $("favoriteCurrent").textContent=store.favorites.includes(current.es)?"★ 已收藏":"☆ 收藏这个词";
 }
 function shuffle(arr){return arr.slice().sort(()=>Math.random()-.5)}
@@ -363,15 +369,11 @@ async function answerQuestion(selected,button,selectedMeaning){
  if(questionAnswered||!current)return;
  questionAnswered=true;
  const correct=selected.id===current.id;
- const dir=$("directionSelect").value;
- const target=currentQuizTarget();
  const reverse=quizDirectionsAreReverse();
- const rightAnswer=reverse?current.es:quizGloss(current,target);
+ const rightAnswer=reverse?current.es:quizGloss(current);
  document.querySelectorAll(".option").forEach(b=>{b.disabled=true});
  const allButtons=[...document.querySelectorAll(".option")];
- allButtons.forEach(b=>{
-  if(exactKey(b.textContent)===exactKey(rightAnswer))b.classList.add("correct");
- });
+ allButtons.forEach(b=>{if(exactKey(b.textContent)===exactKey(rightAnswer))b.classList.add("correct")});
  if(!correct)button.classList.add("wrong");
  const attempt=store.attempts[current.es]||{correct:0,wrong:0};
  if(correct){attempt.correct++;store.daily[todayKey]=(store.daily[todayKey]||0)+1}
@@ -385,27 +387,26 @@ async function answerQuestion(selected,button,selectedMeaning){
   store.lastStudy=todayKey;
  }
  save();updateStats();renderSaved();
- 
- const chinese=quizGloss(current,"zh")||"中文释义可在词条详情中按需查询";
+ const chinese=quizGloss(current)||"中文释义暂缺";
  const exampleZh=current.exampleZh||store.translationCache["example|"+exactKey(current.es)]||"";
  const fb=$("feedback");
  fb.className="feedback show "+(correct?"good":"bad");
- fb.innerHTML="<strong>"+(correct?"¡Muy bien! 答对了！":"Sigue practicando. 再记一次！")+"</strong>"+
+ fb.innerHTML="<strong>"+(correct?"答对了！":"再记一次！")+"</strong>"+
   "<div>西班牙语："+escapeHtml(current.es)+"</div>"+
-  "<div class='small'>中文： "+escapeHtml(chinese)+"</div>"+
-  (current.ipa?"<div class='small'>IPA: "+escapeHtml(current.ipa)+"</div>":"")+
+  "<div class='small'>中文释义："+escapeHtml(chinese)+"</div>"+
+  (current.ipa?"<div class='small'>音标："+escapeHtml(current.ipa)+"</div>":"")+
   (current.exampleEs?"<div class='small'>西语例句："+escapeHtml(current.exampleEs)+(exampleZh?"<br>中文翻译："+escapeHtml(exampleZh):"")+"<br><span>例句来源：Tatoeba</span></div>":"")+
   (current.formNote?"<div class='small'>词形说明："+escapeHtml(current.formNote)+"</div>":"")+
-  "<div class='small'>答题记录：正确 "+attempt.correct+" 次 · 错误 "+attempt.wrong+" 次</div>";
+  "<div class='small'>答题记录：答对 "+attempt.correct+" 次 · 答错 "+attempt.wrong+" 次</div>";
  addSrsRatings(fb,current,correct);
  $("nextButton").disabled=true;
- $("progressCopy").textContent="选择记忆程度后进入下一题 · Rate your recall to continue";
+ $("progressCopy").textContent="请选择记忆程度，再进入下一题";
 }
 function addSrsRatings(container,w,wasCorrect){
  const wrap=document.createElement("div");wrap.className="small";wrap.style.marginTop="12px";
  const label=document.createElement("div");label.textContent="这次你记住了吗？选择下次复习间隔：";wrap.append(label);
  const row=document.createElement("div");row.style.display="flex";row.style.flexWrap="wrap";row.style.gap="7px";row.style.marginTop="8px";
- const options=[["again","忘了 · Again"],["hard","困难 · Hard"],["good","记住 · Good"],["easy","简单 · Easy"]];
+ const options=[["again","忘了"],["hard","有点困难"],["good","记住了"],["easy","很简单"]];
  options.forEach(([rating,text])=>{
   const b=document.createElement("button");b.type="button";b.className="subtle";b.textContent=text;
   b.addEventListener("click",()=>{
@@ -490,7 +491,7 @@ function wordRow(w){
  const strong=document.createElement("strong");strong.textContent=w.es;
  const small=document.createElement("small");small.textContent=w.level+" · "+posLabel(w.pos)+(w.ipa?" · "+w.ipa:"");
  main.append(strong,small);
- const meaning=document.createElement("div");meaning.className="word-meaning";meaning.textContent=storedMeaning(w,"zh")||"点击查看中文释义";
+ const meaning=document.createElement("div");meaning.className="word-meaning";meaning.textContent=storedMeaning(w)||"点击查看中文释义";
  const actions=document.createElement("div");actions.className="row-actions";
  const detail=document.createElement("button");detail.className="star";detail.textContent="查看";detail.addEventListener("click",()=>showDetail(w));
  const fav=document.createElement("button");fav.className="star";fav.textContent=store.favorites.includes(w.es)?"★":"☆";fav.title="收藏";fav.addEventListener("click",()=>toggleFavorite(w));
@@ -504,23 +505,21 @@ function showDetail(w){
  const panel=$("detailPanel");
  panel.classList.remove("hidden");
  panel.dataset.wordId=w.id;
- const cachedZh=storedMeaning(w,"zh");
- 
- const initialZh=cachedZh||"中文释义尚未保存；正在尝试查询。";
- 
+ const cachedZh=storedMeaning(w);
+ const initialZh=cachedZh||"尚未保存中文释义，正在查询…";
  const exampleZh=w.exampleZh||store.translationCache["example|"+exactKey(w.es)]||"";
  panel.innerHTML="<div class='panel-head'><div class='detail-label'>"+w.level+" · "+escapeHtml(posLabel(w.pos))+"</div><button class='star' id='closeDetail'>关闭 ×</button></div>"+
   "<h3>"+escapeHtml(w.es)+"</h3>"+
   "<p class='detail-label'>发音音标</p><p>"+escapeHtml(w.ipa||"暂无音标")+"</p>"+
   "<p class='detail-label'>中文释义</p><p id='detailChinese'>"+escapeHtml(initialZh)+"</p>"+
   (w.formNote?"<p class='detail-label'>词形说明</p><p>"+escapeHtml(w.formNote)+"</p>":"")+
-  (w.exampleEs?"<p class='detail-label'>例句</p><p>"+escapeHtml(w.exampleEs)+"<br><span id='detailExampleChinese'>"+escapeHtml(exampleZh||"中文例句暂未提供")+"</span><br><small>来源：Tatoeba</small></p>":"<p class='detail-label'>例句</p><p>此词条暂时没有匹配到例句。</p>")+
+  (w.exampleEs?"<p class='detail-label'>例句</p><p>"+escapeHtml(w.exampleEs)+"<br><span id='detailExampleChinese'>"+escapeHtml(exampleZh||"正在查询中文例句…")+"</span><br><small>来源：Tatoeba</small></p>":"<p class='detail-label'>例句</p><p>此词条暂时没有匹配到例句。</p>")+
   "<div class='actions'><button class='subtle' id='detailSpeak'>🔊 听发音</button><button class='primary' id='detailFav'>"+(store.favorites.includes(w.es)?"★ 已收藏":"☆ 加入收藏")+"</button></div>";
  $("closeDetail").addEventListener("click",()=>panel.classList.add("hidden"));
  $("detailSpeak").addEventListener("click",()=>{const u=new SpeechSynthesisUtterance(w.es);u.lang="es-ES";speechSynthesis.speak(u)});
  $("detailFav").addEventListener("click",()=>toggleFavorite(w));
  panel.scrollIntoView({behavior:"smooth",block:"nearest"});
- const tasks=[w.zh?Promise.resolve(w.zh):translateWord(w,"zh"),w.exampleEs?translateExample(w):Promise.resolve("")];
+ const tasks=[w.zh?Promise.resolve(w.zh):translateWord(w),w.exampleEs?translateExample(w):Promise.resolve("")];
  Promise.all(tasks).then(res=>{
   if(panel.dataset.wordId!==w.id)return;
   const zh=$("detailChinese"),ex=$("detailExampleChinese");
@@ -561,7 +560,7 @@ function renderSaved(){
  if(!$("favoritesList").children.length)$("favoritesList").innerHTML="<div class='empty'>还没有收藏的词汇。测验中点击「收藏这个词」即可添加。</div>";
  if(!$("mistakesList").children.length)$("mistakesList").innerHTML="<div class='empty'>暂无错题。答错的单词会自动添加到这里。</div>";
 }
-if("serviceWorker" in navigator && location.protocol.startsWith("http"))window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+if("serviceWorker" in navigator && location.protocol.startsWith("http"))window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=20261122-cn3").catch(()=>{}));
 loadVocab();
 </script>
 </body>
