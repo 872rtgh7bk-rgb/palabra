@@ -1,22 +1,21 @@
 {
   "datasetName": "PALABRA Spanish Vocabulary",
-  "version": "2.0.0",
-  "totalEntries": 7000,
+  "version": "3.0.0",
+  "totalEntries": 7468,
   "counts": {
     "A1": 500,
     "A2": 986,
     "B1": 2007,
-    "B2": 3507
+    "B2": 3975
   },
   "language": "es",
   "interfaceLanguages": [
-    "zh-CN",
-    "en"
+    "zh-CN"
   ],
   "levelFramework": "Community CEFR-aligned list; not an official DELE/Instituto Cervantes master list",
   "source": "Talhakasikci/cefr-vocabulary-dataset Spanish A1–B2 CSV; augmented with 32 bilingual starter entries",
   "sourceUrl": "https://github.com/Talhakasikci/cefr-vocabulary-dataset",
-  "sourceLimitations": "Community-made and automatically/semi-automatically compiled. Some entries may be inflected forms; some English definitions and IPA fields are missing or imperfect. Level labels are indicative.",
+  "sourceLimitations": "社区整理的 CEFR 参考词表，并非官方 DELE 词表；部分条目为动词变位或词形，词性和音标可能有缺漏。中文释义按需从中文维基词典及在线翻译查询，并缓存到本机。",
   "licenseNote": "Dataset source README states free for personal and educational projects; attribution and review recommended.",
   "generatedAt": "2026-11-22",
   "fields": [
@@ -40,20 +39,23 @@
     "accentSensitive": true
   },
   "examples": {
-    "totalWithSpanishEnglishExamples": 3976,
-    "source": "Tatoeba via fufu70/spanish-english-json; CC BY 2.0 FR as documented by upstream doozan/spanish_data"
+    "totalSpanishExamples": 3976,
+    "displayLanguage": "Spanish with Chinese translation only",
+    "source": "Tatoeba via upstream Spanish vocabulary dataset; original dataset attribution retained in source fields"
   },
   "coverage": {
-    "totalEntries": 7000,
-    "uniqueSpanishEntries": 7000,
+    "totalEntries": 7468,
+    "uniqueSpanishEntries": 7468,
     "englishPreloadedGlosses": 2661,
     "chinesePreloadedGlosses": 32,
-    "spanishEnglishExamplePairs": 3976,
-    "englishPreloadedByLevel": {
-      "A1": 79,
-      "A2": 240,
-      "B1": 674,
-      "B2": 1668
+    "spanishExamplePairs": 3976,
+    "chineseExampleTranslationsPreloaded": 32,
+    "chineseTranslationMode": "on-demand; cached locally after successful lookup",
+    "chinesePreloadedByLevel": {
+      "A1": 32,
+      "A2": 0,
+      "B1": 0,
+      "B2": 0
     }
   },
   "dictionarySources": [
@@ -84,5 +86,9 @@
       "license": "CC BY 2.0 FR",
       "contribution": "Spanish-English examples for 3,976 entries"
     }
+  ],
+  "learningLanguages": [
+    "es",
+    "zh-CN"
   ]
 }
