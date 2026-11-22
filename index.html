@@ -65,7 +65,7 @@ footer{text-align:center;color:#9ca398;font-size:10px;line-height:1.7;margin-top
   <div class="panel-head"><div class="panel-title">Vocabulary quiz</div><div class="level-pill" id="levelBadge">A1 · BEGINNER</div></div>
   <div class="controls">
    <select id="levelSelect" aria-label="CEFR level"><option value="ALL">全部等级 · All levels</option><option value="A1">A1 · Beginner</option><option value="A2">A2 · Elementary</option><option value="B1">B1 · Intermediate</option><option value="B2">B2 · Upper intermediate</option></select>
-   <select id="directionSelect" aria-label="Quiz direction"><option value="es-zh">Español → 中文</option><option value="es-en">Español → English</option><option value="zh-es">中文 → Español</option><option value="en-es">English → Español</option></select>
+   <select id="directionSelect" aria-label="Quiz direction"><option value="es-en">Español → English · Recommended</option><option value="en-es">English → Español</option><option value="es-zh">Español → 中文 · Limited</option><option value="zh-es">中文 → Español · Limited</option></select>
   </div>
   <div class="question">
    <div class="prompt" id="promptLabel">请选择正确的中文释义</div>
@@ -257,16 +257,54 @@ function setTab(tab){
  if(tab==="review")renderReview();
 }
 document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>setTab(b.dataset.tab)));
+function quizGloss(w,target){
+ const cached=store.translationCache[cacheKey(w.es,target)]||"";
+ return target==="zh"?(w.zh||cached):(w.en||cached);
+}
+function eligibleWords(pool,target){
+ return pool.filter(w=>Boolean(quizGloss(w,target)));
+}
+function currentQuizTarget(){
+ const dir=$("directionSelect").value;
+ return (dir==="es-zh"||dir==="zh-es")?"zh":"en";
+}
+function quizDirectionsAreReverse(){
+ const dir=$("directionSelect").value;
+ return dir==="zh-es"||dir==="en-es";
+}
+function renderQuizUnavailable(message){
+ $("options").innerHTML="<div class='empty'>"+escapeHtml(message)+"</div>";
+ $("nextButton").disabled=false;
+ $("progressCopy").textContent="可跳过这题，或切换到英语测验";
+ $("favoriteCurrent").textContent=current&&store.favorites.includes(current.es)?"★ 已收藏":"☆ 收藏这个词";
+}
+function skipCurrentQuestion(){
+ if(reviewMode){
+  questionIndex++;
+  newQuestion();
+ }else{
+  questionIndex++;
+  newQuestion();
+ }
+}
 async function newQuestion(){
  if(!words.length)return;
- questionAnswered=false;$("nextButton").disabled=true;$("feedback").className="feedback";$("feedback").innerHTML="";
- const pool=levelWords();if(!pool.length)return;
+ questionAnswered=false;
+ $("nextButton").disabled=true;
+ $("feedback").className="feedback";
+ $("feedback").innerHTML="";
+ const selectedLevelPool=levelWords();
+ const target=currentQuizTarget();
+ const targetLabel=target==="en"?"英文":"中文";
+ const reverse=quizDirectionsAreReverse();
+ const pool=eligibleWords(selectedLevelPool,target);
  if(reviewMode){
+  reviewQueue=reviewQueue.filter(w=>Boolean(quizGloss(w,target)));
   if(!reviewQueue.length){
    reviewMode=false;current=null;
    $("promptLabel").textContent="今日复习已完成 · Review complete";
    $("questionWord").textContent="¡Muy bien!";
-   $("questionIPA").textContent="今天到期的词已经复习完毕。";
+   $("questionIPA").textContent="今天到期且有"+targetLabel+"释义的词已经复习完毕。";
    $("questionPOS").textContent="";
    $("options").innerHTML="<div class='empty'>你可以继续普通测验，或者明天再来复习新到期的词。</div>";
    $("feedback").className="feedback";
@@ -277,59 +315,69 @@ async function newQuestion(){
   }
   current=reviewQueue.shift();
  }else{
+  if(!pool.length){
+   current=null;
+   $("questionWord").textContent="暂时没有可测词条";
+   $("questionIPA").textContent="";
+   $("questionPOS").textContent="";
+   $("promptLabel").textContent="当前等级的本地"+targetLabel+"释义不足";
+   renderQuizUnavailable("这个等级目前没有足够的本地"+targetLabel+"释义可供测验。请切换到英语方向，或选择其他等级。测验不会再逐题调用外部翻译服务。");
+   return;
+  }
   current=pool[Math.floor(Math.random()*pool.length)];
  }
  $("levelBadge").textContent=current.level+" · "+({A1:"BEGINNER",A2:"ELEMENTARY",B1:"INTERMEDIATE",B2:"UPPER INTERMEDIATE"}[current.level]);
  const dir=$("directionSelect").value;
  $("promptLabel").textContent=dir==="es-zh"?"请选择正确的中文释义":dir==="es-en"?"Choose the correct English meaning":dir==="zh-es"?"根据中文释义选择西班牙语":"Choose the Spanish word for this English meaning";
- $("questionWord").textContent=dir==="es-zh"||dir==="es-en"?current.es:"正在查询释义…";
+ const meaning=quizGloss(current,target);
+ $("questionWord").textContent=reverse?meaning:current.es;
  $("questionIPA").textContent=current.ipa||"";
  $("questionPOS").textContent=posLabel(current.pos);
- $("options").innerHTML="<div class='loading'>正在准备选项和查询释义…</div>";
- const optionPool=reviewMode?words.filter(w=>w.level===current.level):pool;
- const poolOthers=shuffle(optionPool.filter(w=>w.id!==current.id)).slice(0,3);
- const candidates=shuffle([current,...poolOthers]);
- const target=(dir==="es-zh"||dir==="zh-es")?"zh":"en";
- const meanings=await Promise.all(candidates.map(w=>translateWord(w,target)));
- if(!current)return;
- const reverse=(dir==="zh-es"||dir==="en-es");
- const currentMeaning=meanings[candidates.indexOf(current)];
- if(reverse)$("questionWord").textContent=currentMeaning;
- const unavailable=v=>!v||v==="释义暂不可用"||v==="Meaning unavailable";
- const currentText=reverse?current.es:currentMeaning;
- const uniqueRows=unavailable(currentText)?[]:[{w:current,text:currentText}];
- const seenOptions=new Set(unavailable(currentText)?[]:[exactKey(currentText)]);
- candidates.filter(w=>w.id!==current.id).forEach(w=>{
-  const i=candidates.indexOf(w),value=reverse?w.es:meanings[i];
-  const k=exactKey(value);
-  if(!unavailable(value)&&!seenOptions.has(k)&&uniqueRows.length<4){uniqueRows.push({w,text:value});seenOptions.add(k)}
+ const available=reviewMode?eligibleWords(words.filter(w=>w.level===current.level),target):pool;
+ const otherPool=shuffle(available.filter(w=>w.id!==current.id));
+ const candidates=[current,...otherPool.slice(0,3)];
+ const seen=new Set();
+ const uniqueRows=[];
+ candidates.forEach(w=>{
+  const value=reverse?w.es:quizGloss(w,target);
+  const key=exactKey(value);
+  if(value&&!seen.has(key)){
+   seen.add(key);
+   uniqueRows.push({w,text:value});
+  }
  });
- if(unavailable(currentMeaning)||uniqueRows.length<2){
-  $("options").innerHTML="<div class='empty'>这个词暂时没有可用的双语释义，翻译服务可能达到免费额度。请稍后再试，或先在词典中查看已有资料。</div>";
+ if(uniqueRows.length<2){
+  $("options").innerHTML="<div class='empty'>当前等级可用的本地释义较少，无法组成可靠的选择题。请换一个等级或测验方向。</div>";
   $("nextButton").disabled=false;
-  $("progressCopy").textContent="Translation unavailable · Skip this word";
+  $("progressCopy").textContent="释义覆盖不足 · 可以跳过";
   $("favoriteCurrent").textContent=store.favorites.includes(current.es)?"★ 已收藏":"☆ 收藏这个词";
   return;
  }
  $("options").innerHTML="";
  uniqueRows.forEach(x=>{
-  const b=document.createElement("button");b.className="option";b.textContent=x.text;
-  b.addEventListener("click",()=>answerQuestion(x.w,b,x.text));$("options").appendChild(b);
+  const b=document.createElement("button");
+  b.className="option";
+  b.textContent=x.text;
+  b.addEventListener("click",()=>answerQuestion(x.w,b,x.text));
+  $("options").appendChild(b);
  });
- $("progressCopy").textContent=reviewMode?"今日复习 · "+reviewQueue.length+" 题剩余":"Question "+questionIndex+" · "+pool.length.toLocaleString("en")+" words in this level";
+ $("progressCopy").textContent=reviewMode?"今日复习 · "+reviewQueue.length+" 题剩余":"Question "+questionIndex+" · "+pool.length.toLocaleString("en")+" words with offline "+targetLabel+" glosses";
  $("favoriteCurrent").textContent=store.favorites.includes(current.es)?"★ 已收藏":"☆ 收藏这个词";
 }
 function shuffle(arr){return arr.slice().sort(()=>Math.random()-.5)}
 async function answerQuestion(selected,button,selectedMeaning){
- if(questionAnswered)return;questionAnswered=true;
+ if(questionAnswered||!current)return;
+ questionAnswered=true;
  const correct=selected.id===current.id;
+ const dir=$("directionSelect").value;
+ const target=currentQuizTarget();
+ const reverse=quizDirectionsAreReverse();
+ const rightAnswer=reverse?current.es:quizGloss(current,target);
  document.querySelectorAll(".option").forEach(b=>{b.disabled=true});
  const allButtons=[...document.querySelectorAll(".option")];
- const dir=$("directionSelect").value,target=(dir==="es-zh"||dir==="zh-es")?"zh":"en";
- const reverse=(dir==="zh-es"||dir==="en-es");
- const rightMeaning=await translateWord(current,target);
- const rightAnswer=reverse?current.es:rightMeaning;
- allButtons.forEach(b=>{if(exactKey(b.textContent)===exactKey(rightAnswer))b.classList.add("correct")});
+ allButtons.forEach(b=>{
+  if(exactKey(b.textContent)===exactKey(rightAnswer))b.classList.add("correct");
+ });
  if(!correct)button.classList.add("wrong");
  const attempt=store.attempts[current.es]||{correct:0,wrong:0};
  if(correct){attempt.correct++;store.daily[todayKey]=(store.daily[todayKey]||0)+1}
@@ -337,14 +385,22 @@ async function answerQuestion(selected,button,selectedMeaning){
  store.attempts[current.es]=attempt;
  if(correct&&!store.known.includes(current.es)&&attempt.correct>=2)store.known.push(current.es);
  const last=store.lastStudy||"";
- if(last!==todayKey){const yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);store.streak=last===yesterday?(store.streak||0)+1:1;store.lastStudy=todayKey}
+ if(last!==todayKey){
+  const yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);
+  store.streak=last===yesterday?(store.streak||0)+1:1;
+  store.lastStudy=todayKey;
+ }
  save();updateStats();renderSaved();
- const results=await Promise.all([translateWord(current,"zh"),translateWord(current,"en"),translateExample(current)]);
- const fb=$("feedback");fb.className="feedback show "+(correct?"good":"bad");
+ const english=quizGloss(current,"en")||"英文释义尚未预载";
+ const chinese=quizGloss(current,"zh")||"中文释义可在词条详情中按需查询";
+ const exampleZh=current.exampleZh||store.translationCache["example|"+exactKey(current.es)]||"";
+ const fb=$("feedback");
+ fb.className="feedback show "+(correct?"good":"bad");
  fb.innerHTML="<strong>"+(correct?"¡Muy bien! 答对了！":"Sigue practicando. 再记一次！")+"</strong>"+
-  "<div>"+escapeHtml(current.es)+" · "+escapeHtml(results[0])+" · "+escapeHtml(results[1])+"</div>"+
+  "<div>"+escapeHtml(current.es)+" · "+escapeHtml(english)+"</div>"+
+  "<div class='small'>中文： "+escapeHtml(chinese)+"</div>"+
   (current.ipa?"<div class='small'>IPA: "+escapeHtml(current.ipa)+"</div>":"")+
-  (current.exampleEs?"<div class='small'>"+escapeHtml(current.exampleEs)+(results[2]?"<br>"+escapeHtml(results[2]):"")+"<br><i>"+escapeHtml(current.exampleEn)+"</i><br><span>例句来源：Tatoeba</span></div>":"")+
+  (current.exampleEs?"<div class='small'>"+escapeHtml(current.exampleEs)+(exampleZh?"<br>"+escapeHtml(exampleZh):"")+"<br><i>"+escapeHtml(current.exampleEn)+"</i><br><span>例句来源：Tatoeba</span></div>":"")+
   (current.formNote?"<div class='small'>词形说明："+escapeHtml(current.formNote)+"</div>":"")+
   "<div class='small'>答题记录：正确 "+attempt.correct+" 次 · 错误 "+attempt.wrong+" 次</div>";
  addSrsRatings(fb,current,correct);
