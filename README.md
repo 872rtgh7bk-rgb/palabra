@@ -9,9 +9,9 @@ The repository contains **exactly 7,000 Spanish vocabulary entries**:
 | Level | Entries |
 |---|---:|
 | A1 | 500 |
-| A2 | 992 |
-| B1 | 2,009 |
-| B2 | 3,499 |
+| A2 | 986 |
+| B1 | 2,007 |
+| B2 | 3,507 |
 | **Total** | **7,000** |
 
 The level-tagged list was adapted from the community-made [CEFR Vocabulary Dataset](https://github.com/Talhakasikci/cefr-vocabulary-dataset), Spanish CSV files for A1–B2, with 32 bilingual starter entries retained. The source project describes itself as unofficial and automatically/semi-automatically compiled. It warns that CEFR labels, IPA, definitions and entries may contain gaps or errors. Some entries are inflected forms rather than dictionary headwords; therefore the app calls them vocabulary entries, not 7,000 independently verified lemmas.
