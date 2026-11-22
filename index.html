@@ -19,7 +19,7 @@ header{display:flex;justify-content:space-between;align-items:center;gap:14px;ma
 .brand{display:flex;align-items:center;gap:11px}.logo{width:42px;height:42px;border-radius:14px;background:var(--green);color:white;display:grid;place-items:center;font-size:21px;font-weight:850}.brand-name{font-weight:900;letter-spacing:1.7px;font-size:19px}.brand-sub{font-size:10px;color:var(--muted);letter-spacing:1.5px;margin-top:3px}
 .header-state{border:1px solid var(--line);background:#fff;border-radius:100px;padding:8px 12px;color:var(--muted);font-size:11px;white-space:nowrap}
 .hero{display:flex;justify-content:space-between;gap:20px;align-items:flex-end}.eyebrow{font-size:10px;font-weight:850;letter-spacing:2px;color:var(--green);text-transform:uppercase}h1{margin:9px 0 8px;font-size:clamp(29px,6vw,43px);line-height:1.06;letter-spacing:-1.7px}.intro{font-size:13px;line-height:1.65;color:var(--muted);margin:0;max-width:530px}
-.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:23px 0}.metric{background:#fff;border:1px solid var(--line);border-radius:17px;padding:13px 15px}.metric strong{display:block;font-size:23px;letter-spacing:-.8px}.metric span{color:var(--muted);font-size:10px}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:23px 0}.metric{background:#fff;border:1px solid var(--line);border-radius:17px;padding:13px 15px}.metric strong{display:block;font-size:23px;letter-spacing:-.8px}.metric span{color:var(--muted);font-size:10px}
 .tabs{display:flex;gap:7px;overflow:auto;padding:3px 1px 12px;margin-bottom:8px}.tab{border:1px solid var(--line);border-radius:100px;padding:10px 15px;background:#fff;color:var(--muted);font-size:12px;white-space:nowrap}.tab.active{background:var(--green);border-color:var(--green);color:#fff;font-weight:750}
 .panel{background:#fff;border:1px solid var(--line);border-radius:23px;padding:20px;box-shadow:var(--shadow)}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}.panel-title{font-size:15px;font-weight:850}.level-pill{background:var(--green-soft);color:var(--green);padding:7px 11px;border-radius:99px;font-size:10px;font-weight:850;white-space:nowrap}
 .controls{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:16px}select,.search{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px;background:#fcfcf9;color:var(--ink);font-size:12px;outline:none}
@@ -35,7 +35,7 @@ header{display:flex;justify-content:space-between;align-items:center;gap:14px;ma
 .loading{color:var(--muted);font-size:12px;padding:18px;text-align:center}
 footer{text-align:center;color:#9ca398;font-size:10px;line-height:1.7;margin-top:26px}
 .hidden{display:none!important}
-@media(max-width:520px){.shell{padding:17px 14px 38px}header{margin-bottom:23px}.panel{padding:16px}.metrics{gap:7px}.metric{padding:11px}.metric strong{font-size:20px}.hero{align-items:flex-start;flex-direction:column}.controls{grid-template-columns:1fr 1fr}.word-row{align-items:flex-start}.word-meaning{font-size:10px}}
+@media(max-width:520px){.shell{padding:17px 14px 38px}header{margin-bottom:23px}.panel{padding:16px}.metrics{grid-template-columns:repeat(2,1fr);gap:7px}.metric{padding:11px}.metric strong{font-size:20px}.hero{align-items:flex-start;flex-direction:column}.controls{grid-template-columns:1fr 1fr}.word-row{align-items:flex-start}.word-meaning{font-size:10px}}
 </style>
 </head>
 <body>
@@ -50,13 +50,15 @@ footer{text-align:center;color:#9ca398;font-size:10px;line-height:1.7;margin-top
 <div class="metrics">
  <div class="metric"><strong id="totalCount">—</strong><span>词库词条 / WORDS</span></div>
  <div class="metric"><strong id="masteredCount">0</strong><span>已掌握 / MASTERED</span></div>
+ <div class="metric"><strong id="dueCount">0</strong><span>待复习 / DUE TODAY</span></div>
  <div class="metric"><strong id="todayCount">0</strong><span>今日答对 / TODAY</span></div>
 </div>
 <nav class="tabs" aria-label="Main sections">
  <button class="tab active" data-tab="learn">测验学习 · Learn</button>
  <button class="tab" data-tab="dictionary">词典 · Dictionary</button>
  <button class="tab" data-tab="favorites">收藏 · Saved</button>
- <button class="tab" data-tab="mistakes">错题 · Review</button>
+ <button class="tab" data-tab="mistakes">错题 · Mistakes</button>
+ <button class="tab" data-tab="review">复习计划 · SRS</button>
 </nav>
 <section id="learnSection" class="section">
  <div class="panel">
@@ -102,7 +104,19 @@ footer{text-align:center;color:#9ca398;font-size:10px;line-height:1.7;margin-top
  <div class="panel"><div class="panel-head"><div class="panel-title">Your saved words</div><div class="level-pill" id="favoriteCount">0 SAVED</div></div><div class="word-list" id="favoritesList"></div></div>
 </section>
 <section id="mistakesSection" class="section hidden">
- <div class="panel"><div class="panel-head"><div class="panel-title">Words to review</div><div class="level-pill" id="mistakeCount">0 TO REVIEW</div></div><div class="word-list" id="mistakesList"></div></div>
+ <div class="panel"><div class="panel-head"><div class="panel-title">Incorrect answers</div><div class="level-pill" id="mistakeCount">0 TO REVIEW</div></div><div class="word-list" id="mistakesList"></div></div>
+</section>
+<section id="reviewSection" class="section hidden">
+ <div class="panel">
+  <div class="panel-head"><div class="panel-title">Spaced repetition plan</div><div class="level-pill">SRS · LOCAL</div></div>
+  <p class="intro">根据每次回忆难度自动安排下次复习。答错或忘记的词优先进入短间隔复习；答得越稳，复习间隔逐渐拉长。</p>
+  <div class="actions"><div class="progress-copy" id="reviewSummary">正在计算到期词汇…</div><button class="primary" id="startReviewBtn">开始今天复习 →</button></div>
+  <div class="section-head"><strong>今天到期 · Due now</strong><span id="dueLabel">0 words</span></div>
+  <div class="word-list" id="dueList"></div>
+  <div class="section-head"><strong>之后复习 · Upcoming</strong><span>按计划日期</span></div>
+  <div class="word-list" id="upcomingList"></div>
+  <div class="notice">复习记录保存在当前浏览器。评分：忘了＝约 10 分钟后重试；困难＝较短间隔；记住＝逐步增加到 1、3、7、14、30 天；简单＝更长间隔。清除 Safari 网站数据可能会删除这些记录。</div>
+ </div>
 </section>
 <footer>PALABRA · Personal Spanish vocabulary trainer<br>CEFR labels are indicative, not an official DELE master list. Meanings from automatic lookup should be checked in context.</footer>
 </div>
@@ -124,11 +138,30 @@ function readStore(){
  return {known:old.known||[],favorites:[],mistakes:[],attempts:{},daily:old.daily||{},lastStudy:old.lastStudy||"",streak:old.streak||0,translationCache:{}};
 }
 store=readStore();
-store.known=store.known||[];store.favorites=store.favorites||[];store.mistakes=store.mistakes||[];store.attempts=store.attempts||{};store.daily=store.daily||{};store.translationCache=store.translationCache||{};
+store.known=store.known||[];store.favorites=store.favorites||[];store.mistakes=store.mistakes||[];store.attempts=store.attempts||{};store.daily=store.daily||{};store.translationCache=store.translationCache||{};store.review=store.review||{};
+let reviewMode=false,reviewQueue=[];
 function save(){try{localStorage.setItem(STORE_KEY,JSON.stringify(store))}catch(e){console.warn("Could not save progress",e)}}
+function dueReviewWords(){
+ const now=Date.now(),mistakes=new Set(store.mistakes.map(exactKey));
+ return words.filter(w=>{
+  const rec=store.review[exactKey(w.es)];
+  return (rec&&rec.dueAt&&Date.parse(rec.dueAt)<=now)||(!rec&&mistakes.has(exactKey(w.es)));
+ }).sort((a,b)=>{
+  const da=store.review[exactKey(a.es)]?.dueAt||"";
+  const db=store.review[exactKey(b.es)]?.dueAt||"";
+  return da.localeCompare(db);
+ });
+}
+function upcomingReviewWords(){
+ return words.filter(w=>{
+  const rec=store.review[exactKey(w.es)];
+  return rec&&rec.dueAt&&Date.parse(rec.dueAt)>Date.now();
+ }).sort((a,b)=>Date.parse(store.review[exactKey(a.es)].dueAt)-Date.parse(store.review[exactKey(b.es)].dueAt));
+}
 function updateStats(){
  $("totalCount").textContent=words.length.toLocaleString("en");
  $("masteredCount").textContent=store.known.length.toLocaleString("en");
+ $("dueCount").textContent=dueReviewWords().length.toLocaleString("en");
  $("todayCount").textContent=(store.daily[todayKey]||0).toLocaleString("en");
  $("favoriteCount").textContent=store.favorites.length+" SAVED";
  $("mistakeCount").textContent=store.mistakes.length+" TO REVIEW";
@@ -148,7 +181,7 @@ async function loadVocab(){
   words.sort((a,b)=>a.level.localeCompare(b.level)||a.es.localeCompare(b.es,"es"));
   $("loadState").textContent=words.length.toLocaleString("en")+" words loaded";
   $("dictionaryCount").textContent=words.length.toLocaleString("en")+" WORDS";
-  updateStats();renderSaved();renderDictionary();newQuestion();
+  updateStats();renderSaved();renderReview();renderDictionary();newQuestion();
  }catch(err){
   $("loadState").textContent="词库加载失败";
   $("options").innerHTML="<div class='empty'>词库未能加载，请刷新页面并检查网络连接。</div>";
@@ -198,16 +231,34 @@ function storedMeaning(w,target){
 }
 function setTab(tab){
  document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));
- ["learn","dictionary","favorites","mistakes"].forEach(name=>$(name+"Section").classList.toggle("hidden",name!==tab));
+ ["learn","dictionary","favorites","mistakes","review"].forEach(name=>$(name+"Section").classList.toggle("hidden",name!==tab));
  if(tab==="favorites"||tab==="mistakes")renderSaved();
  if(tab==="dictionary")renderDictionary();
+ if(tab==="review")renderReview();
 }
 document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>setTab(b.dataset.tab)));
 async function newQuestion(){
  if(!words.length)return;
  questionAnswered=false;$("nextButton").disabled=true;$("feedback").className="feedback";$("feedback").innerHTML="";
  const pool=levelWords();if(!pool.length)return;
- current=pool[Math.floor(Math.random()*pool.length)];
+ if(reviewMode){
+  if(!reviewQueue.length){
+   reviewMode=false;current=null;
+   $("promptLabel").textContent="今日复习已完成 · Review complete";
+   $("questionWord").textContent="¡Muy bien!";
+   $("questionIPA").textContent="今天到期的词已经复习完毕。";
+   $("questionPOS").textContent="";
+   $("options").innerHTML="<div class='empty'>你可以继续普通测验，或者明天再来复习新到期的词。</div>";
+   $("feedback").className="feedback";
+   $("nextButton").disabled=true;
+   $("progressCopy").textContent="Today's review complete";
+   renderReview();updateStats();
+   return;
+  }
+  current=reviewQueue.shift();
+ }else{
+  current=pool[Math.floor(Math.random()*pool.length)];
+ }
  $("levelBadge").textContent=current.level+" · "+({A1:"BEGINNER",A2:"ELEMENTARY",B1:"INTERMEDIATE",B2:"UPPER INTERMEDIATE"}[current.level]);
  const dir=$("directionSelect").value;
  $("promptLabel").textContent=dir==="es-zh"?"请选择正确的中文释义":dir==="es-en"?"Choose the correct English meaning":dir==="zh-es"?"根据中文释义选择西班牙语":"Choose the Spanish word for this English meaning";
@@ -220,15 +271,25 @@ async function newQuestion(){
  const target=(dir==="es-zh"||dir==="zh-es")?"zh":"en";
  const meanings=await Promise.all(candidates.map(w=>translateWord(w,target)));
  if(!current)return;
- if(dir==="zh-es"||dir==="en-es")$("questionWord").textContent=meanings[candidates.indexOf(current)];
+ const reverse=(dir==="zh-es"||dir==="en-es");
+ const currentMeaning=meanings[candidates.indexOf(current)];
+ if(reverse)$("questionWord").textContent=currentMeaning;
+ const unavailable=v=>!v||v==="释义暂不可用"||v==="Meaning unavailable";
+ const optionRows=candidates.map((w,i)=>({w,text:reverse?w.es:meanings[i]})).filter(x=>!unavailable(x.text));
+ const uniqueRows=optionRows.filter((x,i,a)=>a.findIndex(y=>exactKey(y.text)===exactKey(x.text))===i);
+ if(unavailable(currentMeaning)||uniqueRows.length<2){
+  $("options").innerHTML="<div class='empty'>这个词暂时没有可用的双语释义，翻译服务可能达到免费额度。请稍后再试，或先在词典中查看已有资料。</div>";
+  $("nextButton").disabled=false;
+  $("progressCopy").textContent="Translation unavailable · Skip this word";
+  $("favoriteCurrent").textContent=store.favorites.includes(current.es)?"★ 已收藏":"☆ 收藏这个词";
+  return;
+ }
  $("options").innerHTML="";
- candidates.forEach((w,i)=>{
-  const b=document.createElement("button");b.className="option";
-  const reverse=(dir==="zh-es"||dir==="en-es");
-  b.textContent=reverse?w.es:meanings[i];
-  b.addEventListener("click",()=>answerQuestion(w,b,b.textContent));$("options").appendChild(b);
+ uniqueRows.forEach(x=>{
+  const b=document.createElement("button");b.className="option";b.textContent=x.text;
+  b.addEventListener("click",()=>answerQuestion(x.w,b,x.text));$("options").appendChild(b);
  });
- $("progressCopy").textContent="Question "+questionIndex+" · "+pool.length.toLocaleString("en")+" words in this level";
+ $("progressCopy").textContent=reviewMode?"今日复习 · "+reviewQueue.length+" 题剩余":"Question "+questionIndex+" · "+pool.length.toLocaleString("en")+" words in this level";
  $("favoriteCurrent").textContent=store.favorites.includes(current.es)?"★ 已收藏":"☆ 收藏这个词";
 }
 function shuffle(arr){return arr.slice().sort(()=>Math.random()-.5)}
@@ -238,10 +299,10 @@ async function answerQuestion(selected,button,selectedMeaning){
  document.querySelectorAll(".option").forEach(b=>{b.disabled=true});
  const allButtons=[...document.querySelectorAll(".option")];
  const dir=$("directionSelect").value,target=(dir==="es-zh"||dir==="zh-es")?"zh":"en";
- const answerIndex=allButtons.findIndex(b=>b===button);
- const clickedMeaning=selectedMeaning;
+ const reverse=(dir==="zh-es"||dir==="en-es");
  const rightMeaning=await translateWord(current,target);
- allButtons.forEach(b=>{if(b.textContent===rightMeaning)b.classList.add("correct")});
+ const rightAnswer=reverse?current.es:rightMeaning;
+ allButtons.forEach(b=>{if(exactKey(b.textContent)===exactKey(rightAnswer))b.classList.add("correct")});
  if(!correct)button.classList.add("wrong");
  const attempt=store.attempts[current.es]||{correct:0,wrong:0};
  if(correct){attempt.correct++;store.daily[todayKey]=(store.daily[todayKey]||0)+1}
@@ -259,9 +320,78 @@ async function answerQuestion(selected,button,selectedMeaning){
   (current.exampleEs?"<div class='small'>"+escapeHtml(current.exampleEs)+(results[2]?"<br>"+escapeHtml(results[2]):"")+"<br><i>"+escapeHtml(current.exampleEn)+"</i><br><span>例句来源：Tatoeba</span></div>":"")+
   (current.formNote?"<div class='small'>词形说明："+escapeHtml(current.formNote)+"</div>":"")+
   "<div class='small'>答题记录：正确 "+attempt.correct+" 次 · 错误 "+attempt.wrong+" 次</div>";
+ addSrsRatings(fb,current,correct);
  $("nextButton").disabled=false;
  $("progressCopy").textContent=correct?"Correct · Great work":"Review this word again";
 }
+function addSrsRatings(container,w,wasCorrect){
+ const wrap=document.createElement("div");wrap.className="small";wrap.style.marginTop="12px";
+ const label=document.createElement("div");label.textContent="这次你记住了吗？选择下次复习间隔：";wrap.append(label);
+ const row=document.createElement("div");row.style.display="flex";row.style.flexWrap="wrap";row.style.gap="7px";row.style.marginTop="8px";
+ const options=[["again","忘了 · Again"],["hard","困难 · Hard"],["good","记住 · Good"],["easy","简单 · Easy"]];
+ options.forEach(([rating,text])=>{
+  const b=document.createElement("button");b.type="button";b.className="subtle";b.textContent=text;
+  b.addEventListener("click",()=>{
+   if(b.disabled)return;
+   [...row.querySelectorAll("button")].forEach(x=>x.disabled=true);
+   const due=scheduleReview(w,rating);
+   label.textContent="已安排下次复习："+due+"（"+text+"）";
+   b.style.background="#eaf1eb";
+  });
+  row.append(b);
+ });
+ container.append(wrap);wrap.append(row);
+}
+function scheduleReview(w,rating){
+ const key=exactKey(w.es),now=Date.now();
+ const rec=store.review[key]||{repetitions:0,intervalDays:0,ease:2.5};
+ rec.lastReviewed=new Date(now).toISOString();rec.lastRating=rating;
+ if(rating==="again"){
+  rec.repetitions=0;rec.intervalDays=10/1440;rec.dueAt=new Date(now+10*60*1000).toISOString();
+  rec.ease=Math.max(1.3,(rec.ease||2.5)-0.2);
+  if(!store.mistakes.includes(w.es))store.mistakes.push(w.es);
+ }else if(rating==="hard"){
+  rec.intervalDays=Math.max(1,Math.round((rec.intervalDays||1)*1.2));
+  rec.repetitions=(rec.repetitions||0)+1;
+  rec.ease=Math.max(1.3,(rec.ease||2.5)-0.15);
+  rec.dueAt=new Date(now+rec.intervalDays*86400000).toISOString();
+ }else if(rating==="good"){
+  const intervals=[1,3,7,14,30,60,90];
+  rec.intervalDays=intervals[Math.min(rec.repetitions||0,intervals.length-1)];
+  rec.repetitions=(rec.repetitions||0)+1;
+  rec.dueAt=new Date(now+rec.intervalDays*86400000).toISOString();
+  if((rec.repetitions||0)>=4&&!store.known.includes(w.es))store.known.push(w.es);
+  store.mistakes=store.mistakes.filter(x=>exactKey(x)!==key);
+ }else{
+  rec.intervalDays=(rec.repetitions||0)===0?4:Math.max(2,Math.round((rec.intervalDays||1)*2));
+  rec.repetitions=(rec.repetitions||0)+1;
+  rec.ease=Math.min(3.2,(rec.ease||2.5)+0.15);
+  rec.dueAt=new Date(now+rec.intervalDays*86400000).toISOString();
+  if((rec.repetitions||0)>=4&&!store.known.includes(w.es))store.known.push(w.es);
+  store.mistakes=store.mistakes.filter(x=>exactKey(x)!==key);
+ }
+ store.review[key]=rec;save();updateStats();renderSaved();renderReview();
+ return new Date(rec.dueAt).toLocaleString("zh-CN",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"});
+}
+function renderReview(){
+ if(!words.length)return;
+ const due=dueReviewWords(),upcoming=upcomingReviewWords();
+ $("dueLabel").textContent=due.length+" words";
+ $("reviewSummary").textContent=due.length?("现在有 "+due.length+" 个词需要复习。"): "目前没有到期复习词汇。";
+ $("startReviewBtn").disabled=!due.length;
+ $("dueList").innerHTML="";$("upcomingList").innerHTML="";
+ due.slice(0,60).forEach(w=>$("dueList").append(wordRow(w)));
+ upcoming.slice(0,30).forEach(w=>{
+  const row=wordRow(w);const info=document.createElement("small");
+  info.textContent="下次："+new Date(store.review[exactKey(w.es)].dueAt).toLocaleDateString("zh-CN");
+  row.querySelector(".word-row-main").append(info);$("upcomingList").append(row);
+ });
+ if(!due.length)$("dueList").innerHTML="<div class='empty'>目前没有到期的复习卡片。答题后给词汇选择记忆难度，它们会自动进入复习计划。</div>";
+ if(!upcoming.length)$("upcomingList").innerHTML="<div class='empty'>还没有安排未来复习。</div>";
+}
+$("startReviewBtn").addEventListener("click",()=>{
+ reviewQueue=dueReviewWords().slice();reviewMode=true;questionIndex=1;setTab("learn");newQuestion();
+});
 function escapeHtml(s){return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 $("nextButton").addEventListener("click",()=>{questionIndex++;newQuestion()});
 $("levelSelect").addEventListener("change",()=>{questionIndex=1;newQuestion()});
