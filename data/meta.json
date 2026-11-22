@@ -36,5 +36,9 @@
   "validation": {
     "uniqueSpanishHeadwords": 7000,
     "duplicateCount": 0
+  },
+  "examples": {
+    "totalWithSpanishEnglishExamples": 3976,
+    "source": "Tatoeba via fufu70/spanish-english-json; CC BY 2.0 FR as documented by upstream doozan/spanish_data"
   }
 }
