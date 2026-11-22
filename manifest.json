@@ -1,8 +1,8 @@
 {
-  "name": "PALABRA — Spanish Vocabulary",
+  "name": "PALABRA — 西班牙语词汇",
   "short_name": "PALABRA",
-  "description": "Bilingual Spanish vocabulary practice",
-  "start_url": "./",
+  "description": "西班牙语与中文词汇学习、测验和复习",
+  "start_url": "./?v=20261122-cn3",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f7f6f2",
