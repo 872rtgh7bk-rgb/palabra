@@ -113,6 +113,7 @@ const LEGACY_KEY="palabra-progress";
 const todayKey=new Date().toISOString().slice(0,10);
 let words=[],wordByEs=new Map(),store={},current=null,questionAnswered=false,questionIndex=1,page=1,pageSize=35,visibleRows=[];
 const $=id=>document.getElementById(id);
+function exactKey(s){return String(s||"").toLocaleLowerCase("es").trim().replace(/\s+/g," ")}
 function clean(s){return String(s||"").toLocaleLowerCase("es").normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim()}
 function readStore(){
  try{
@@ -143,7 +144,7 @@ function levelWords(){
 async function loadVocab(){
  try{
   const files=await Promise.all(LEVELS.map(l=>fetch("./data/"+l.toLowerCase()+".json",{cache:"no-cache"}).then(r=>{if(!r.ok)throw new Error("Failed loading "+l);return r.json()})));
-  words=files.flat();wordByEs=new Map(words.map(w=>[clean(w.es),w]));
+  words=files.flat();wordByEs=new Map(words.map(w=>[exactKey(w.es),w]));
   words.sort((a,b)=>a.level.localeCompare(b.level)||a.es.localeCompare(b.es,"es"));
   $("loadState").textContent=words.length.toLocaleString("en")+" words loaded";
   $("dictionaryCount").textContent=words.length.toLocaleString("en")+" WORDS";
@@ -154,7 +155,7 @@ async function loadVocab(){
   console.error(err);
  }
 }
-function cacheKey(es,lang){return clean(es)+"|"+lang}
+function cacheKey(es,lang){return exactKey(es)+"|"+lang}
 async function translateWord(w,target){
  const key=cacheKey(w.es,target);
  if(store.translationCache[key])return store.translationCache[key];
@@ -319,8 +320,8 @@ function renderSaved(){
  if(!words.length)return;
  const dict=wordByEs;
  $("favoritesList").innerHTML="";$("mistakesList").innerHTML="";
- store.favorites.slice().reverse().forEach(es=>{const w=dict.get(clean(es));if(w)$("favoritesList").append(wordRow(w))});
- store.mistakes.slice().reverse().forEach(es=>{const w=dict.get(clean(es));if(w)$("mistakesList").append(wordRow(w))});
+ store.favorites.slice().reverse().forEach(es=>{const w=dict.get(exactKey(es));if(w)$("favoritesList").append(wordRow(w))});
+ store.mistakes.slice().reverse().forEach(es=>{const w=dict.get(exactKey(es));if(w)$("mistakesList").append(wordRow(w))});
  if(!$("favoritesList").children.length)$("favoritesList").innerHTML="<div class='empty'>还没有收藏的词汇。测验中点击「收藏这个词」即可添加。</div>";
  if(!$("mistakesList").children.length)$("mistakesList").innerHTML="<div class='empty'>暂无错题。答错的单词会自动添加到这里。</div>";
 }
