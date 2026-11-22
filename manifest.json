@@ -1,0 +1,19 @@
+{
+  "name": "PALABRA — Spanish Vocabulary",
+  "short_name": "PALABRA",
+  "description": "Bilingual Spanish vocabulary practice",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7f6f2",
+  "theme_color": "#315c49",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
