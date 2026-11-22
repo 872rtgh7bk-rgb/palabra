@@ -1,6 +1,6 @@
 {
   "datasetName": "PALABRA Spanish Vocabulary",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "totalEntries": 7468,
   "counts": {
     "A1": 500,
@@ -24,13 +24,9 @@
     "level",
     "pos",
     "ipa",
-    "en",
     "zh",
     "exampleEs",
-    "exampleZh",
-    "exampleEn",
-    "formNote",
-    "source"
+    "exampleZh"
   ],
   "validation": {
     "uniqueSpanishEntries": 7000,
@@ -39,36 +35,29 @@
     "accentSensitive": true
   },
   "examples": {
-    "totalSpanishExamples": 3976,
-    "displayLanguage": "Spanish with Chinese translation only",
-    "source": "Tatoeba via upstream Spanish vocabulary dataset; original dataset attribution retained in source fields"
+    "totalSpanishExamples": 2428,
+    "displayLanguage": "西班牙语原句及中文翻译",
+    "source": "Tatoeba；遵循上游数据集注明的 CC BY 2.0 FR"
   },
   "coverage": {
     "totalEntries": 7468,
     "uniqueSpanishEntries": 7468,
-    "englishPreloadedGlosses": 2661,
     "chinesePreloadedGlosses": 32,
-    "spanishExamplePairs": 3976,
-    "chineseExampleTranslationsPreloaded": 32,
-    "chineseTranslationMode": "on-demand; cached locally after successful lookup",
+    "chineseTranslationMode": "按需查询中文词典或在线翻译，成功后保存在本机",
     "chinesePreloadedByLevel": {
       "A1": 32,
       "A2": 0,
       "B1": 0,
       "B2": 0
-    }
+    },
+    "spanishExamplePairs": 2428,
+    "chineseExampleTranslationsPreloaded": 32
   },
   "dictionarySources": [
     {
       "name": "CEFR Vocabulary Dataset",
       "url": "https://github.com/Talhakasikci/cefr-vocabulary-dataset",
       "contribution": "Spanish CEFR word list, POS and IPA; unofficial and may contain errors or missing definitions"
-    },
-    {
-      "name": "en-es-en-Dic",
-      "url": "https://github.com/mananoreboton/en-es-en-Dic",
-      "license": "Apache-2.0",
-      "contribution": "Additional English glosses for matching Spanish verbs"
     },
     {
       "name": "Wiktionary via WiktAPI",
