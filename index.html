@@ -81,7 +81,7 @@ footer{text-align:center;color:#9ca398;font-size:10px;line-height:1.7;margin-top
    <button class="subtle" id="favoriteCurrent">☆ 收藏这个词</button>
    <button class="subtle" id="speakCurrent">🔊 听发音</button>
   </div>
-  <div class="notice">释义说明：词表来源没有提供完整的中英释义。App 会优先使用词条已有释义；缺少的释义会在联网时按需查询并缓存在本机。机器翻译可能有误，尤其是多义词。首次下载词库后，已缓存的词条可离线查看。</div>
+  <div class="notice">词库包含 7,000 个不重复条目，其中 3,976 个配有西语原句和英文对照。完整中英词义并非全部预先人工录入：缺少的释义和中文例句会联网按需翻译并缓存在本机。机器翻译可能有误，尤其是多义词。首次下载词库后，已缓存的词条可离线查看。</div>
  </div>
 </section>
 <section id="dictionarySection" class="section hidden">
@@ -156,6 +156,22 @@ async function loadVocab(){
  }
 }
 function cacheKey(es,lang){return exactKey(es)+"|"+lang}
+async function translateExample(w){
+ if(!w.exampleEs)return "";
+ if(w.exampleZh)return w.exampleZh;
+ const key="example|"+exactKey(w.es);
+ if(store.translationCache[key])return store.translationCache[key];
+ try{
+  const url="https://api.mymemory.translated.net/get?q="+encodeURIComponent(w.exampleEs)+"&langpair="+encodeURIComponent("es|zh-CN");
+  const response=await fetch(url);
+  if(!response.ok)throw new Error("Example translation unavailable");
+  const data=await response.json();
+  if(data.responseStatus&&data.responseStatus!==200)throw new Error("Example translation unavailable");
+  const result=String(data.responseData&&data.responseData.translatedText||"").replace(/&quot;/g,'"').replace(/&#39;/g,"'").trim();
+  if(!result)throw new Error("Empty example translation");
+  store.translationCache[key]=result;save();return result;
+ }catch(e){return ""}
+}
 async function translateWord(w,target){
  const key=cacheKey(w.es,target);
  if(store.translationCache[key])return store.translationCache[key];
@@ -235,12 +251,12 @@ async function answerQuestion(selected,button,selectedMeaning){
  const last=store.lastStudy||"";
  if(last!==todayKey){const yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);store.streak=last===yesterday?(store.streak||0)+1:1;store.lastStudy=todayKey}
  save();updateStats();renderSaved();
- const results=await Promise.all([translateWord(current,"zh"),translateWord(current,"en")]);
+ const results=await Promise.all([translateWord(current,"zh"),translateWord(current,"en"),translateExample(current)]);
  const fb=$("feedback");fb.className="feedback show "+(correct?"good":"bad");
  fb.innerHTML="<strong>"+(correct?"¡Muy bien! 答对了！":"Sigue practicando. 再记一次！")+"</strong>"+
   "<div>"+escapeHtml(current.es)+" · "+escapeHtml(results[0])+" · "+escapeHtml(results[1])+"</div>"+
   (current.ipa?"<div class='small'>IPA: "+escapeHtml(current.ipa)+"</div>":"")+
-  (current.exampleEs?"<div class='small'>"+escapeHtml(current.exampleEs)+"<br>"+escapeHtml(current.exampleZh)+"<br><i>"+escapeHtml(current.exampleEn)+"</i></div>":"")+
+  (current.exampleEs?"<div class='small'>"+escapeHtml(current.exampleEs)+(results[2]?"<br>"+escapeHtml(results[2]):"")+"<br><i>"+escapeHtml(current.exampleEn)+"</i><br><span>例句来源：Tatoeba</span></div>":"")+
   (current.formNote?"<div class='small'>词形说明："+escapeHtml(current.formNote)+"</div>":"")+
   "<div class='small'>答题记录：正确 "+attempt.correct+" 次 · 错误 "+attempt.wrong+" 次</div>";
  $("nextButton").disabled=false;
@@ -277,14 +293,14 @@ function toggleFavorite(w){
 }
 async function showDetail(w){
  const panel=$("detailPanel");panel.classList.remove("hidden");panel.innerHTML="<div class='loading'>正在查询中英释义…</div>";
- const res=await Promise.all([translateWord(w,"zh"),translateWord(w,"en")]);
+ const res=await Promise.all([translateWord(w,"zh"),translateWord(w,"en"),translateExample(w)]);
  panel.innerHTML="<div class='panel-head'><div class='detail-label'>"+w.level+" · "+escapeHtml(posLabel(w.pos))+"</div><button class='star' id='closeDetail'>关闭 ×</button></div>"+
   "<h3>"+escapeHtml(w.es)+"</h3>"+
   "<p class='detail-label'>IPA · PRONUNCIATION</p><p>"+escapeHtml(w.ipa||"暂无音标")+"</p>"+
   "<p class='detail-label'>中文释义 · CHINESE</p><p>"+escapeHtml(res[0])+"</p>"+
   "<p class='detail-label'>English meaning</p><p>"+escapeHtml(res[1])+"</p>"+
   (w.formNote?"<p class='detail-label'>词形说明</p><p>"+escapeHtml(w.formNote)+"</p>":"")+
-  (w.exampleEs?"<p class='detail-label'>例句 · EXAMPLE</p><p>"+escapeHtml(w.exampleEs)+"<br>"+escapeHtml(w.exampleZh)+"<br>"+escapeHtml(w.exampleEn)+"</p>":"<p class='detail-label'>例句</p><p>此词条的原始数据没有附例句，暂不显示未经核验的例句。</p>")+
+  (w.exampleEs?"<p class='detail-label'>例句 · EXAMPLE</p><p>"+escapeHtml(w.exampleEs)+(res[2]?"<br>"+escapeHtml(res[2]):"")+"<br>"+escapeHtml(w.exampleEn)+"<br><small>来源：Tatoeba</small></p>":"<p class='detail-label'>例句</p><p>此词条暂时没有匹配到例句。</p>")+
   "<div class='actions'><button class='subtle' id='detailSpeak'>🔊 听发音</button><button class='primary' id='detailFav'>"+(store.favorites.includes(w.es)?"★ 已收藏":"☆ 加入收藏")+"</button></div>";
  $("closeDetail").addEventListener("click",()=>panel.classList.add("hidden"));
  $("detailSpeak").addEventListener("click",()=>{const u=new SpeechSynthesisUtterance(w.es);u.lang="es-ES";speechSynthesis.speak(u)});
