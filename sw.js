@@ -1,4 +1,4 @@
-const CACHE_NAME = "palabra-v2-7000-unique-v3";
+const CACHE_NAME = "palabra-v2-7000-srs-wiktionary";
 const APP_FILES = [
   "./",
   "./index.html",
