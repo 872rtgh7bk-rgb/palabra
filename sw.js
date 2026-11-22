@@ -1,4 +1,4 @@
-const CACHE_NAME = "palabra-v2-7000-unique";
+const CACHE_NAME = "palabra-v2-7000-unique-v2";
 const APP_FILES = [
   "./",
   "./index.html",
