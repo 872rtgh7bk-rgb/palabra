@@ -45,7 +45,7 @@ footer{text-align:center;color:#9ca398;font-size:10px;line-height:1.7;margin-top
  <div class="header-state" id="loadState">正在加载词库…</div>
 </header>
 <section class="hero">
- <div><div class="eyebrow">Tu camino al español</div><h1>7,000 words.<br>Your Spanish journey.</h1><p class="intro">从 A1 到 B2，按等级积累词汇。测验、查词、收藏和错题记录会保存在这台设备上。<br>Learn with Spanish, English and Chinese support.</p></div>
+ <div><div class="eyebrow">Tu camino al español</div><h1>7,000 entries.<br>Your Spanish journey.</h1><p class="intro">从 A1 到 B2，按等级积累词汇。测验、查词、收藏和错题记录会保存在这台设备上。<br>Learn with Spanish, English and Chinese support.</p></div>
 </section>
 <div class="metrics">
  <div class="metric"><strong id="totalCount">—</strong><span>词库词条 / WORDS</span></div>
@@ -206,7 +206,10 @@ async function newQuestion(){
  if(dir==="zh-es"||dir==="en-es")$("questionWord").textContent=meanings[candidates.indexOf(current)];
  $("options").innerHTML="";
  candidates.forEach((w,i)=>{
-  const b=document.createElement("button");b.className="option";b.textContent=meanings[i];b.addEventListener("click",()=>answerQuestion(w,b,meanings[i]));$("options").appendChild(b);
+  const b=document.createElement("button");b.className="option";
+  const reverse=(dir==="zh-es"||dir==="en-es");
+  b.textContent=reverse?w.es:meanings[i];
+  b.addEventListener("click",()=>answerQuestion(w,b,b.textContent));$("options").appendChild(b);
  });
  $("progressCopy").textContent="Question "+questionIndex+" · "+pool.length.toLocaleString("en")+" words in this level";
  $("favoriteCurrent").textContent=store.favorites.includes(current.es)?"★ 已收藏":"☆ 收藏这个词";
