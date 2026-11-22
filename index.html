@@ -274,8 +274,8 @@ function quizDirectionsAreReverse(){
 }
 function renderQuizUnavailable(message){
  $("options").innerHTML="<div class='empty'>"+escapeHtml(message)+"</div>";
- $("nextButton").disabled=false;
- $("progressCopy").textContent="可跳过这题，或切换到英语测验";
+ $("nextButton").disabled= !current;
+ $("progressCopy").textContent=current?"可跳过这题，或切换到英语测验":"请切换测验方向或等级";
  $("favoriteCurrent").textContent=current&&store.favorites.includes(current.es)?"★ 已收藏":"☆ 收藏这个词";
 }
 function skipCurrentQuestion(){
@@ -506,21 +506,39 @@ function toggleFavorite(w){
  const i=store.favorites.indexOf(w.es);if(i>=0)store.favorites.splice(i,1);else store.favorites.push(w.es);
  save();updateStats();renderSaved();renderDictionary();
 }
-async function showDetail(w){
- const panel=$("detailPanel");panel.classList.remove("hidden");panel.innerHTML="<div class='loading'>正在查询中英释义…</div>";
- const res=await Promise.all([translateWord(w,"zh"),translateWord(w,"en"),translateExample(w)]);
+function showDetail(w){
+ const panel=$("detailPanel");
+ panel.classList.remove("hidden");
+ panel.dataset.wordId=w.id;
+ const cachedZh=storedMeaning(w,"zh");
+ const cachedEn=storedMeaning(w,"en");
+ const initialZh=cachedZh||"中文释义尚未保存；正在尝试查询。";
+ const initialEn=cachedEn||"English meaning not stored; looking it up…";
+ const exampleZh=w.exampleZh||store.translationCache["example|"+exactKey(w.es)]||"";
  panel.innerHTML="<div class='panel-head'><div class='detail-label'>"+w.level+" · "+escapeHtml(posLabel(w.pos))+"</div><button class='star' id='closeDetail'>关闭 ×</button></div>"+
   "<h3>"+escapeHtml(w.es)+"</h3>"+
   "<p class='detail-label'>IPA · PRONUNCIATION</p><p>"+escapeHtml(w.ipa||"暂无音标")+"</p>"+
-  "<p class='detail-label'>中文释义 · CHINESE</p><p>"+escapeHtml(res[0])+"</p>"+
-  "<p class='detail-label'>English meaning</p><p>"+escapeHtml(res[1])+"</p>"+
+  "<p class='detail-label'>中文释义 · CHINESE</p><p id='detailChinese'>"+escapeHtml(initialZh)+"</p>"+
+  "<p class='detail-label'>English meaning</p><p id='detailEnglish'>"+escapeHtml(initialEn)+"</p>"+
   (w.formNote?"<p class='detail-label'>词形说明</p><p>"+escapeHtml(w.formNote)+"</p>":"")+
-  (w.exampleEs?"<p class='detail-label'>例句 · EXAMPLE</p><p>"+escapeHtml(w.exampleEs)+(res[2]?"<br>"+escapeHtml(res[2]):"")+"<br>"+escapeHtml(w.exampleEn)+"<br><small>来源：Tatoeba</small></p>":"<p class='detail-label'>例句</p><p>此词条暂时没有匹配到例句。</p>")+
+  (w.exampleEs?"<p class='detail-label'>例句 · EXAMPLE</p><p>"+escapeHtml(w.exampleEs)+"<br><span id='detailExampleChinese'>"+escapeHtml(exampleZh||"中文例句可在联网时查询")+"</span><br><i>"+escapeHtml(w.exampleEn)+"</i><br><small>来源：Tatoeba</small></p>":"<p class='detail-label'>例句</p><p>此词条暂时没有匹配到例句。</p>")+
   "<div class='actions'><button class='subtle' id='detailSpeak'>🔊 听发音</button><button class='primary' id='detailFav'>"+(store.favorites.includes(w.es)?"★ 已收藏":"☆ 加入收藏")+"</button></div>";
  $("closeDetail").addEventListener("click",()=>panel.classList.add("hidden"));
  $("detailSpeak").addEventListener("click",()=>{const u=new SpeechSynthesisUtterance(w.es);u.lang="es-ES";speechSynthesis.speak(u)});
  $("detailFav").addEventListener("click",()=>toggleFavorite(w));
  panel.scrollIntoView({behavior:"smooth",block:"nearest"});
+ const tasks=[
+  w.zh?Promise.resolve(w.zh):translateWord(w,"zh"),
+  cachedEn?Promise.resolve(cachedEn):translateWord(w,"en"),
+  w.exampleEs?translateExample(w):Promise.resolve("")
+ ];
+ Promise.all(tasks).then(res=>{
+  if(panel.dataset.wordId!==w.id)return;
+  const zh=$("detailChinese"),en=$("detailEnglish"),ex=$("detailExampleChinese");
+  if(zh)zh.textContent=res[0]||"暂时无法查询中文释义";
+  if(en)en.textContent=res[1]||"暂时无法查询英文释义";
+  if(ex&&res[2])ex.textContent=res[2];
+ }).catch(()=>{});
 }
 function renderDictionary(){
  if(!words.length)return;
