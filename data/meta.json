@@ -42,5 +42,41 @@
   "examples": {
     "totalWithSpanishEnglishExamples": 3976,
     "source": "Tatoeba via fufu70/spanish-english-json; CC BY 2.0 FR as documented by upstream doozan/spanish_data"
-  }
+  },
+  "coverage": {
+    "totalEntries": 7000,
+    "uniqueSpanishEntries": 7000,
+    "englishPreloadedGlosses": 2661,
+    "chinesePreloadedGlosses": 32,
+    "spanishEnglishExamplePairs": 3976
+  },
+  "dictionarySources": [
+    {
+      "name": "CEFR Vocabulary Dataset",
+      "url": "https://github.com/Talhakasikci/cefr-vocabulary-dataset",
+      "contribution": "Spanish CEFR word list, POS and IPA; unofficial and may contain errors or missing definitions"
+    },
+    {
+      "name": "en-es-en-Dic",
+      "url": "https://github.com/mananoreboton/en-es-en-Dic",
+      "license": "Apache-2.0",
+      "contribution": "Additional English glosses for matching Spanish verbs"
+    },
+    {
+      "name": "Wiktionary via WiktAPI",
+      "url": "https://wiktapi.dev/",
+      "contribution": "On-demand bilingual gloss lookups where the selected edition contains the Spanish entry"
+    },
+    {
+      "name": "MyMemory",
+      "url": "https://mymemory.translated.net/",
+      "contribution": "Fallback on-demand machine translation; subject to anonymous daily usage limits"
+    },
+    {
+      "name": "Tatoeba",
+      "url": "https://tatoeba.org/",
+      "license": "CC BY 2.0 FR",
+      "contribution": "Spanish-English examples for 3,976 entries"
+    }
+  ]
 }
