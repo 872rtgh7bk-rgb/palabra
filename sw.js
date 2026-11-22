@@ -1,5 +1,15 @@
-const CACHE_NAME = "palabra-starter-v1";
-const APP_FILES = ["./", "./index.html", "./manifest.json", "./icon.svg"];
+const CACHE_NAME = "palabra-v2-7000";
+const APP_FILES = [
+  "./",
+  "./index.html",
+  "./manifest.json",
+  "./icon.svg",
+  "./data/meta.json",
+  "./data/a1.json",
+  "./data/a2.json",
+  "./data/b1.json",
+  "./data/b2.json"
+];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_FILES)));
   self.skipWaiting();
@@ -11,12 +21,20 @@ self.addEventListener("activate", event => {
   self.clients.claim();
 });
 self.addEventListener("fetch", event => {
-  if (event.request.method !== "GET") return;
+  if (event.request.method !== "GET" || new URL(event.request.url).origin !== self.location.origin) return;
   event.respondWith(
-    caches.match(event.request).then(cached => cached || fetch(event.request).then(response => {
-      const copy = response.clone();
-      caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
-      return response;
-    }).catch(() => caches.match("./index.html")))
+    caches.match(event.request).then(cached => {
+      if (cached) return cached;
+      return fetch(event.request).then(response => {
+        if (response && response.ok) {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
+        }
+        return response;
+      }).catch(() => {
+        if (event.request.mode === "navigate") return caches.match("./index.html");
+        return cached;
+      });
+    })
   );
 });
