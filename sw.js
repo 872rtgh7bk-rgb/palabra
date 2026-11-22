@@ -1,4 +1,4 @@
-const CACHE_NAME = "palabra-v2-7000-english-first-async-details";
+const CACHE_NAME = "palabra-v2-7000-english-first-level-coverage";
 const APP_FILES = [
   "./",
   "./index.html",
