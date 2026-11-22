@@ -34,8 +34,10 @@
     "source"
   ],
   "validation": {
-    "uniqueSpanishHeadwords": 7000,
-    "duplicateCount": 0
+    "uniqueSpanishEntries": 7000,
+    "uniqueIds": 7000,
+    "duplicateCount": 0,
+    "accentSensitive": true
   },
   "examples": {
     "totalWithSpanishEnglishExamples": 3976,
