@@ -88,7 +88,7 @@ footer{text-align:center;color:#9ca398;font-size:10px;line-height:1.7;margin-top
 </section>
 <section id="dictionarySection" class="section hidden">
  <div class="panel">
-  <div class="panel-head"><div class="panel-title">查找西班牙语词汇</div><div class="level-pill" id="dictionaryCount">7,000 WORDS</div></div>
+  <div class="panel-head"><div class="panel-title">查找西班牙语词汇</div><div class="level-pill" id="dictionaryCount">7,000 个词条</div></div>
   <div class="toolbar">
    <input class="search" id="searchInput" placeholder="搜索西班牙语或中文…" autocomplete="off">
    <select id="dictLevel"><option value="ALL">全部等级</option><option value="A1">A1</option><option value="A2">A2</option><option value="B1">B1</option><option value="B2">B2</option></select>
@@ -111,7 +111,7 @@ footer{text-align:center;color:#9ca398;font-size:10px;line-height:1.7;margin-top
   <div class="panel-head"><div class="panel-title">间隔复习计划</div><div class="level-pill">本地复习计划</div></div>
   <p class="intro">根据每次回忆难度自动安排下次复习。答错或忘记的词优先进入短间隔复习；答得越稳，复习间隔逐渐拉长。</p>
   <div class="actions"><div class="progress-copy" id="reviewSummary">正在计算到期词汇…</div><button class="primary" id="startReviewBtn">开始今天复习 →</button></div>
-  <div class="section-head"><strong>今天需要复习</strong><span id="dueLabel">0 words</span></div>
+  <div class="section-head"><strong>今天需要复习</strong><span id="dueLabel">0 个词</span></div>
   <div class="word-list" id="dueList"></div>
   <div class="section-head"><strong>之后复习</strong><span>按计划日期</span></div>
   <div class="word-list" id="upcomingList"></div>
@@ -180,7 +180,7 @@ async function loadVocab(){
   words=files.flat();wordByEs=new Map(words.map(w=>[exactKey(w.es),w]));
   words.sort((a,b)=>a.level.localeCompare(b.level)||a.es.localeCompare(b.es,"es"));
   $("loadState").textContent=words.length.toLocaleString("zh-CN")+" words loaded";
-  $("dictionaryCount").textContent=words.length.toLocaleString("zh-CN")+" WORDS";
+  $("dictionaryCount").textContent=words.length.toLocaleString("zh-CN")+" 个词条";
   updateStats();renderSaved();renderReview();renderDictionary();newQuestion();
  }catch(err){
   $("loadState").textContent="词库加载失败";
@@ -269,7 +269,7 @@ function quizDirectionsAreReverse(){ return $("directionSelect").value==="zh-es"
 function renderQuizUnavailable(message){
  $("options").innerHTML="<div class='empty'>"+escapeHtml(message)+"</div>";
  $("nextButton").disabled= !current;
- $("progressCopy").textContent=current?"可跳过这题，或切换到英语测验":"请切换测验方向或等级";
+ $("progressCopy").textContent=current?"可以跳过这道题":"请选择其他等级";
  $("favoriteCurrent").textContent=current&&store.favorites.includes(current.es)?"★ 已收藏":"☆ 收藏这个词";
 }
 function skipCurrentQuestion(){
@@ -296,7 +296,7 @@ async function newQuestion(){
   reviewQueue=reviewQueue.filter(w=>Boolean(quizGloss(w,target)));
   if(!reviewQueue.length){
    reviewMode=false;current=null;
-   $("promptLabel").textContent="今日复习已完成 · Review complete";
+   $("promptLabel").textContent="今日复习已完成";
    $("questionWord").textContent="¡Muy bien!";
    $("questionIPA").textContent="今天到期且有"+targetLabel+"释义的词已经复习完毕。";
    $("questionPOS").textContent="";
@@ -320,7 +320,7 @@ async function newQuestion(){
   }
   current=pool[Math.floor(Math.random()*pool.length)];
  }
- $("levelBadge").textContent=current.level+" · "+({A1:"BEGINNER",A2:"ELEMENTARY",B1:"INTERMEDIATE",B2:"UPPER INTERMEDIATE"}[current.level]);
+ $("levelBadge").textContent=current.level+" · "+({A1:"入门",A2:"初级",B1:"中级",B2:"中高级"}[current.level]);
  const dir=$("directionSelect").value;
  $("promptLabel").textContent=dir==="es-zh"?"请选择正确的中文释义":"根据中文释义选择西班牙语";
  const meaning=quizGloss(current,target);
@@ -455,7 +455,7 @@ function scheduleReview(w,rating){
 function renderReview(){
  if(!words.length)return;
  const due=dueReviewWords(),upcoming=upcomingReviewWords();
- $("dueLabel").textContent=due.length+" words";
+ $("dueLabel").textContent=due.length+" 个词";
  $("reviewSummary").textContent=due.length?("现在有 "+due.length+" 个词需要复习。"): "目前没有到期复习词汇。";
  $("startReviewBtn").disabled=!due.length;
  $("dueList").innerHTML="";$("upcomingList").innerHTML="";
@@ -523,7 +523,7 @@ function showDetail(w){
  const tasks=[w.zh?Promise.resolve(w.zh):translateWord(w,"zh"),w.exampleEs?translateExample(w):Promise.resolve("")];
  Promise.all(tasks).then(res=>{
   if(panel.dataset.wordId!==w.id)return;
-  const zh=$("detailChinese"),en=$("detailEnglish"),ex=$("detailExampleChinese");
+  const zh=$("detailChinese"),ex=$("detailExampleChinese");
   if(zh)zh.textContent=res[0]||"暂时无法查询中文释义";
   if(ex&&res[1])ex.textContent=res[1];
  }).catch(()=>{});
