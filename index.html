@@ -139,7 +139,7 @@ function readStore(){
 }
 store=readStore();
 store.known=store.known||[];store.favorites=store.favorites||[];store.mistakes=store.mistakes||[];store.attempts=store.attempts||{};store.daily=store.daily||{};store.translationCache=store.translationCache||{};store.review=store.review||{};
-let reviewMode=false,reviewQueue=[];
+let reviewMode=false,reviewQueue=[],dictionaryLookupToken=0;
 function save(){try{localStorage.setItem(STORE_KEY,JSON.stringify(store))}catch(e){console.warn("Could not save progress",e)}}
 function dueReviewWords(){
  const now=Date.now(),mistakes=new Set(store.mistakes.map(exactKey));
@@ -188,7 +188,7 @@ async function loadVocab(){
   words.sort((a,b)=>a.level.localeCompare(b.level)||a.es.localeCompare(b.es,"es"));
   $("loadState").textContent="已加载 "+words.length.toLocaleString("zh-CN")+" 个词条";
   $("dictionaryCount").textContent=words.length.toLocaleString("zh-CN")+" 个词条";
-  updateStats();renderSaved();renderReview();renderDictionary();newQuestion();
+  updateStats();renderSaved();renderReview();newQuestion();
  }catch(err){
   $("loadState").textContent="词库加载失败";
   $("options").innerHTML="<div class='empty'>词库未能加载，请刷新页面并检查网络连接。</div>";
@@ -554,7 +554,30 @@ function renderDictionary(){
  const pages=Math.max(1,Math.ceil(visibleRows.length/pageSize));page=Math.min(page,pages);
  const start=(page-1)*pageSize;
  $("dictionaryList").innerHTML="";
- visibleRows.slice(start,start+pageSize).forEach(w=>$("dictionaryList").append(wordRow(w)));
+ const lookupToken=++dictionaryLookupToken;
+ const currentPageWords=visibleRows.slice(start,start+pageSize);
+ const pendingLookups=[];
+ currentPageWords.forEach(w=>{
+  const row=wordRow(w);
+  const meaning=row.querySelector(".word-meaning");
+  if(!storedMeaning(w)){
+   meaning.textContent="正在查询中文释义…";
+   pendingLookups.push({word:w,meaning});
+  }
+  $("dictionaryList").append(row);
+ });
+ (async()=>{
+  for(let i=0;i<pendingLookups.length;i+=4){
+   if(lookupToken!==dictionaryLookupToken)return;
+   const batch=pendingLookups.slice(i,i+4);
+   await Promise.all(batch.map(async item=>{
+    await translateWord(item.word);
+    if(lookupToken===dictionaryLookupToken&&item.meaning.isConnected){
+     item.meaning.textContent=storedMeaning(item.word)||"暂时没有查到中文释义";
+    }
+   }));
+  }
+ })();
  if(!visibleRows.length)$("dictionaryList").innerHTML="<div class='empty'>没有找到词条。请尝试西班牙语单词或已有的中文释义。</div>";
  $("resultSummary").textContent=visibleRows.length.toLocaleString("zh-CN")+" 个匹配词条";
  $("pageLabel").textContent=page+" / "+pages;
