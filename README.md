@@ -19,17 +19,17 @@ The level-tagged list was adapted from the community-made [CEFR Vocabulary Datas
 ## Features
 
 - Browse and filter all 7,000 entries by CEFR level and part of speech
-- Quiz directions: Spanish → Chinese, Spanish → English, Chinese → Spanish, English → Spanish
+- English-first quizzes: Spanish → English and English → Spanish use preloaded/local cached glosses, avoiding translation API calls during each question; Chinese directions are available only for entries with a stored Chinese gloss
 - IPA display and Spanish speech synthesis where supported by the device
 - Favorites, mistake review, mastered-word tracking and daily progress
-- On-demand bilingual meaning lookup via Wiktionary/WiktAPI where available, with MyMemory as a limited fallback; fetched translations are cached locally
+- On-demand meaning lookup via Wiktionary/WiktAPI where available, with MyMemory as a limited fallback; fetched translations are cached locally and are only requested when a user opens a word detail
 - Spanish/English example sentences for 3,976 entries, sourced from Tatoeba; Chinese example translations are fetched on demand
 - Spaced repetition (Again / Hard / Good / Easy) with due-today and upcoming review queues
 - PWA metadata and service-worker caching of the vocabulary for offline access after the first successful load
 
 ## Translation and example limitations
 
-At the current build, 2,661 entries have a preloaded English gloss and 32 have a preloaded Chinese gloss. Additional glosses are fetched on demand from Wiktionary via WiktAPI when that edition contains a Spanish entry; MyMemory is a fallback machine-translation provider. MyMemory's anonymous free tier is limited to 5,000 characters per day, so PALABRA cannot guarantee that all missing meanings can be translated on demand in one day. Any online dictionary or machine-translation result may be ambiguous or wrong and should be checked in context.
+At the current build, 2,661 entries have a preloaded English gloss and 32 have a preloaded Chinese gloss. Quizzes now use only locally available English glosses or previously cached translations; this avoids making multiple live translation requests for every question. The available English quiz pool is therefore smaller than the full 7,000-word browseable library. Additional glosses are fetched on demand from Wiktionary via WiktAPI when that edition contains a Spanish entry; MyMemory is a fallback machine-translation provider. MyMemory's anonymous free tier is limited to 5,000 characters per day, so PALABRA cannot guarantee that all missing meanings can be translated on demand in one day. Any online dictionary or machine-translation result may be ambiguous or wrong and should be checked in context.
 
 The 32 starter entries include hand-authored Chinese/English examples. A further 3,944 entries have Spanish/English sentence pairs sourced from Tatoeba, making 3,976 example pairs in total; Chinese sentence translations are fetched on demand. These external sentences are not individually reviewed by PALABRA. The rest of the entries do not yet have matched example sentences, noun gender notes or full inflection tables.
 
