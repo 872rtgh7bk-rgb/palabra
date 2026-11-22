@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f7f6f2">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="PALABRA">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icon.svg">
+<title>PALABRA — Spanish Vocabulary</title>
+<style>
+:root{--ink:#20251f;--muted:#7c8278;--paper:#f7f6f2;--card:#fff;--green:#315c49;--green2:#e8f0e9;--line:#e9e8e1;--gold:#e9bd67;--red:#a5483e;--shadow:0 12px 35px rgba(42,49,39,.07)}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans SC",sans-serif;min-height:100vh}
+button,select{font:inherit}button{cursor:pointer}
+.shell{width:min(100%,760px);margin:auto;padding:22px 20px 48px}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:30px}
+.brand{display:flex;align-items:center;gap:11px}.logo{width:42px;height:42px;border-radius:14px;background:var(--green);display:grid;place-items:center;color:#fff;font-weight:800;font-size:20px;letter-spacing:-1px}.brand-name{font-size:20px;font-weight:850;letter-spacing:1.5px}.brand-sub{font-size:11px;color:var(--muted);letter-spacing:1.2px;margin-top:2px}
+.pill{border:1px solid var(--line);background:#fff;border-radius:99px;padding:9px 13px;font-size:12px;color:var(--muted)}
+.eyebrow{font-size:11px;letter-spacing:2px;color:var(--green);font-weight:800;text-transform:uppercase}
+h1{font-size:clamp(29px,7vw,43px);letter-spacing:-1.8px;line-height:1.08;margin:10px 0 9px}
+.intro{color:var(--muted);font-size:14px;line-height:1.6;margin:0 0 22px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:22px 0}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:14px 15px;box-shadow:0 3px 10px rgba(42,49,39,.025)}
+.stat strong{display:block;font-size:23px;letter-spacing:-.7px}.stat span{font-size:11px;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:22px;box-shadow:var(--shadow)}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.panel-title{font-size:15px;font-weight:800}.level{background:var(--green2);color:var(--green);font-size:11px;font-weight:800;padding:7px 11px;border-radius:99px}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+select{width:100%;border:1px solid var(--line);background:#fbfbf9;color:var(--ink);border-radius:12px;padding:12px 13px;font-size:13px;outline:none}
+.question-box{background:#f8f8f4;border:1px solid #eeeee7;border-radius:19px;text-align:center;padding:26px 16px;margin-bottom:16px}
+.prompt{color:var(--muted);font-size:12px;margin-bottom:11px}.word{font-size:clamp(29px,8vw,39px);font-weight:850;letter-spacing:-1px}.word-meta{color:var(--muted);font-size:12px;margin-top:7px;min-height:17px}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.option{background:#fff;border:1px solid var(--line);border-radius:13px;padding:14px 10px;min-height:54px;text-align:center;font-size:14px;color:var(--ink);transition:.15s}
+.option:active{transform:scale(.985)}.option:disabled{cursor:default;opacity:1}
+.option.correct{background:#e9f2eb;border-color:#8ab398;color:#24563a;font-weight:750}.option.wrong{background:#faece9;border-color:#d69a91;color:#963f36}
+.feedback{display:none;border-radius:14px;padding:13px 14px;margin-top:14px;font-size:13px;line-height:1.55}
+.feedback.show{display:block}.feedback.good{background:#edf5ee;color:#28593b}.feedback.bad{background:#fbefed;color:#8e4138}
+.feedback strong{font-size:17px}.example{margin-top:7px;color:inherit;opacity:.9}
+.actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:19px}
+.progress-copy{font-size:11px;color:var(--muted)}.primary{border:0;border-radius:13px;background:var(--green);color:#fff;padding:13px 20px;font-size:13px;font-weight:750;min-width:130px}.primary:disabled{opacity:.4;cursor:not-allowed}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin:27px 2px 12px}.section-head strong{font-size:14px}.section-head span{font-size:11px;color:var(--muted)}
+.word-list{display:grid;gap:8px}.word-row{display:flex;align-items:center;justify-content:space-between;gap:14px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px}.word-row strong{font-size:14px}.word-row small{display:block;color:var(--muted);font-size:11px;margin-top:3px}.word-row .translation{text-align:right;font-size:12px;color:#59645a}
+footer{text-align:center;color:#a0a399;font-size:10px;line-height:1.6;margin-top:28px}
+@media(max-width:420px){.shell{padding:18px 15px 36px}.panel{padding:17px}.stats{gap:7px}.stat{padding:12px}.stat strong{font-size:20px}.options{gap:8px}.option{font-size:13px;padding:12px 7px}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header>
+ <div class="brand"><div class="logo">P</div><div><div class="brand-name">PALABRA</div><div class="brand-sub">SPANISH, ONE WORD AT A TIME</div></div></div>
+ <div class="pill" id="dateLabel">A1 · DAILY PRACTICE</div>
+</header>
+<main>
+ <div class="eyebrow">Tu camino al español</div>
+ <h1>Build your Spanish,<br>one word at a time.</h1>
+ <p class="intro">每天一点点，把西班牙语变成你的第二语言。<br>Learn with bilingual explanations and quick quizzes.</p>
+ <div class="stats">
+  <div class="stat"><strong id="todayCount">0</strong><span>今日答对 / Correct today</span></div>
+  <div class="stat"><strong id="knownCount">0</strong><span>已掌握 / Mastered</span></div>
+  <div class="stat"><strong id="streakCount">0</strong><span>连续学习天数 / Streak</span></div>
+ </div>
+ <section class="panel" aria-label="Vocabulary quiz">
+  <div class="panel-head"><div class="panel-title">Daily vocabulary quiz</div><div class="level" id="levelBadge">A1 · Beginner</div></div>
+  <div class="controls">
+   <select id="levelSelect" aria-label="Choose level"><option value="A1">A1 · Beginner</option><option value="A2">A2 · Elementary</option><option value="B1">B1 · Intermediate</option><option value="B2">B2 · Upper intermediate</option></select>
+   <select id="directionSelect" aria-label="Choose quiz direction"><option value="es-zh">Español → 中文</option><option value="zh-es">中文 → Español</option><option value="en-es">English → Español</option></select>
+  </div>
+  <div class="question-box">
+   <div class="prompt" id="promptLabel">Choose the correct Chinese meaning</div>
+   <div class="word" id="questionWord">hola</div>
+   <div class="word-meta" id="wordMeta">interjección · greeting</div>
+  </div>
+  <div class="options" id="options"></div>
+  <div class="feedback" id="feedback" aria-live="polite"></div>
+  <div class="actions">
+   <div class="progress-copy" id="progressCopy">Question 1 · Take your time</div>
+   <button class="primary" id="nextButton" disabled>Next word →</button>
+  </div>
+ </section>
+ <div class="section-head"><strong>Words in this starter set</strong><span id="wordSetCount">32 words</span></div>
+ <div class="word-list" id="wordList"></div>
+</main>
+<footer>PALABRA · Starter vocabulary set · Your progress is saved on this device.<br>当前版本为初始词库示例，后续会逐步扩充 A1–B2 完整词汇。</footer>
+</div>
+<script>
+const words = [
+{es:"hola",type:"interjección",zh:"你好",en:"hello",example:"Hola, ¿cómo estás?",ez:"你好，你怎么样？",ee:"Hello, how are you?"},
+{es:"adiós",type:"interjección",zh:"再见",en:"goodbye",example:"Adiós, hasta mañana.",ez:"再见，明天见。",ee:"Goodbye, see you tomorrow."},
+{es:"gracias",type:"expresión",zh:"谢谢",en:"thank you",example:"Muchas gracias por tu ayuda.",ez:"非常感谢你的帮助。",ee:"Thank you very much for your help."},
+{es:"por favor",type:"expresión",zh:"请",en:"please",example:"Un café, por favor.",ez:"请来一杯咖啡。",ee:"A coffee, please."},
+{es:"agua",type:"sustantivo · f.",zh:"水",en:"water",example:"Quiero un vaso de agua.",ez:"我想要一杯水。",ee:"I would like a glass of water."},
+{es:"casa",type:"sustantivo · f.",zh:"房子；家",en:"house; home",example:"Mi casa está cerca.",ez:"我家在附近。",ee:"My house is nearby."},
+{es:"comida",type:"sustantivo · f.",zh:"食物；饭",en:"food; meal",example:"La comida está muy rica.",ez:"这顿饭很好吃。",ee:"The food is very tasty."},
+{es:"trabajo",type:"sustantivo · m.",zh:"工作",en:"work; job",example:"Tengo mucho trabajo hoy.",ez:"我今天有很多工作。",ee:"I have a lot of work today."},
+{es:"amigo",type:"sustantivo · m.",zh:"朋友（男性）",en:"male friend",example:"Mi amigo vive en Barcelona.",ez:"我的朋友住在巴塞罗那。",ee:"My friend lives in Barcelona."},
+{es:"familia",type:"sustantivo · f.",zh:"家庭；家人",en:"family",example:"Mi familia es grande.",ez:"我的家庭很大。",ee:"My family is big."},
+{es:"tiempo",type:"sustantivo · m.",zh:"时间；天气",en:"time; weather",example:"No tengo mucho tiempo.",ez:"我没有太多时间。",ee:"I don't have much time."},
+{es:"día",type:"sustantivo · m.",zh:"天；日子",en:"day",example:"Hoy es un buen día.",ez:"今天是美好的一天。",ee:"Today is a good day."},
+{es:"mañana",type:"sustantivo · f. / adverbio",zh:"早上；明天",en:"morning; tomorrow",example:"Mañana tengo clase.",ez:"我明天有课。",ee:"I have class tomorrow."},
+{es:"hoy",type:"adverbio",zh:"今天",en:"today",example:"Hoy estudio español.",ez:"今天我学习西班牙语。",ee:"Today I study Spanish."},
+{es:"ayer",type:"adverbio",zh:"昨天",en:"yesterday",example:"Ayer fui al mercado.",ez:"昨天我去了市场。",ee:"Yesterday I went to the market."},
+{es:"comer",type:"verbo",zh:"吃",en:"to eat",example:"Me gusta comer fruta.",ez:"我喜欢吃水果。",ee:"I like eating fruit."},
+{es:"beber",type:"verbo",zh:"喝",en:"to drink",example:"Bebo café por la mañana.",ez:"我早上喝咖啡。",ee:"I drink coffee in the morning."},
+{es:"vivir",type:"verbo",zh:"居住；生活",en:"to live",example:"Vivo en Barcelona.",ez:"我住在巴塞罗那。",ee:"I live in Barcelona."},
+{es:"hablar",type:"verbo",zh:"说话；讲",en:"to speak; to talk",example:"Hablo un poco de español.",ez:"我会说一点西班牙语。",ee:"I speak a little Spanish."},
+{es:"estudiar",type:"verbo",zh:"学习",en:"to study",example:"Estudio español cada día.",ez:"我每天学习西班牙语。",ee:"I study Spanish every day."},
+{es:"trabajar",type:"verbo",zh:"工作",en:"to work",example:"Trabajo de lunes a viernes.",ez:"我周一到周五工作。",ee:"I work from Monday to Friday."},
+{es:"grande",type:"adjetivo",zh:"大的",en:"big; large",example:"Es una ciudad grande.",ez:"这是一座大城市。",ee:"It is a big city."},
+{es:"pequeño",type:"adjetivo",zh:"小的",en:"small; little",example:"Tengo un perro pequeño.",ez:"我有一只小狗。",ee:"I have a small dog."},
+{es:"bueno",type:"adjetivo",zh:"好的；不错的",en:"good",example:"El café está muy bueno.",ez:"咖啡很好喝。",ee:"The coffee is very good."},
+{es:"malo",type:"adjetivo",zh:"坏的；不好的",en:"bad",example:"Hoy hace mal tiempo.",ez:"今天天气不好。",ee:"The weather is bad today."},
+{es:"nuevo",type:"adjetivo",zh:"新的",en:"new",example:"Tengo un libro nuevo.",ez:"我有一本新书。",ee:"I have a new book."},
+{es:"bonito",type:"adjetivo",zh:"漂亮的；好看的",en:"pretty; beautiful",example:"Barcelona es una ciudad bonita.",ez:"巴塞罗那是一座漂亮的城市。",ee:"Barcelona is a beautiful city."},
+{es:"izquierda",type:"sustantivo · f. / adverbio",zh:"左边；向左",en:"left; on the left",example:"Gira a la izquierda.",ez:"向左转。",ee:"Turn left."},
+{es:"derecha",type:"sustantivo · f. / adverbio",zh:"右边；向右",en:"right; on the right",example:"El banco está a la derecha.",ez:"银行在右边。",ee:"The bank is on the right."},
+{es:"calle",type:"sustantivo · f.",zh:"街道",en:"street",example:"Mi casa está en esta calle.",ez:"我家在这条街上。",ee:"My house is on this street."},
+{es:"tienda",type:"sustantivo · f.",zh:"商店",en:"shop; store",example:"La tienda está abierta.",ez:"商店开着。",ee:"The shop is open."},
+{es:"dinero",type:"sustantivo · m.",zh:"钱",en:"money",example:"No llevo dinero en efectivo.",ez:"我没有带现金。",ee:"I don't carry cash."}
+];
+const $=id=>document.getElementById(id);
+const today=new Date().toISOString().slice(0,10);
+let store={};try{store=JSON.parse(localStorage.getItem("palabra-progress")||"{}")}catch(e){store={}}
+store.known=store.known||[];store.daily=store.daily||{};store.streak=store.streak||0;
+let current=null,answered=false,questionNo=1,correctCount=0;
+function save(){localStorage.setItem("palabra-progress",JSON.stringify(store))}
+function updateStats(){
+ $("todayCount").textContent=store.daily[today]||0;
+ $("knownCount").textContent=store.known.length;
+ $("streakCount").textContent=store.streak;
+}
+function filtered(){return words}
+function shuffle(a){return a.slice().sort(()=>Math.random()-.5)}
+function translate(w,dir){return dir==="es-zh"?w.zh:dir==="zh-es"?w.es:w.es}
+function choiceText(w,dir){return dir==="es-zh"?w.zh:dir==="zh-es"||dir==="en-es"?w.es:w.en}
+function newQuestion(){
+ const pool=filtered();current=pool[Math.floor(Math.random()*pool.length)];answered=false;
+ $("feedback").className="feedback";$("feedback").innerHTML="";
+ $("nextButton").disabled=true;
+ const dir=$("directionSelect").value;
+ $("promptLabel").textContent=dir==="es-zh"?"Choose the correct Chinese meaning":dir==="zh-es"?"请选择对应的西班牙语":"Choose the correct Spanish word";
+ $("questionWord").textContent=dir==="es-zh"?current.es:dir==="zh-es"?current.zh:current.en;
+ $("wordMeta").textContent=dir==="es-zh"?current.type:"Select the matching Spanish vocabulary";
+ $("levelBadge").textContent=$("levelSelect").value+" · "+({"A1":"Beginner","A2":"Elementary","B1":"Intermediate","B2":"Upper intermediate"}[$("levelSelect").value]);
+ const others=shuffle(pool.filter(w=>w!==current)).slice(0,3);
+ const opts=shuffle([current,...others]);
+ $("options").innerHTML="";
+ opts.forEach(w=>{
+  const b=document.createElement("button");b.className="option";b.textContent=choiceText(w,dir);
+  b.addEventListener("click",()=>answer(w,b));$("options").appendChild(b);
+ });
+ $("progressCopy").textContent="Question "+questionNo+" · Take your time";
+}
+function answer(selected,button){
+ if(answered)return;answered=true;
+ const dir=$("directionSelect").value,ok=selected.es===current.es;
+ document.querySelectorAll(".option").forEach(b=>{b.disabled=true;if(b.textContent===choiceText(current,dir))b.classList.add("correct")});
+ if(!ok)button.classList.add("wrong");
+ const fb=$("feedback");fb.className="feedback show "+(ok?"good":"bad");
+ fb.innerHTML=(ok?"<strong>¡Muy bien! Correct!</strong>":"<strong>Not quite — let's learn it.</strong>")+
+  "<div>"+current.es+" · "+current.zh+" · "+current.en+"</div>"+
+  "<div class='example'>"+current.example+"<br>"+current.ez+"<br><i>"+current.ee+"</i></div>";
+ if(ok){
+  correctCount++;store.daily[today]=(store.daily[today]||0)+1;
+  if(!store.known.includes(current.es))store.known.push(current.es);
+  const last=store.lastStudy||"";
+  if(last!==today){const yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);store.streak=last===yesterday?store.streak+1:1;store.lastStudy=today}
+  save();updateStats();
+ }
+ $("nextButton").disabled=false;
+}
+function renderWords(){
+ $("wordSetCount").textContent=words.length+" words";
+ $("wordList").innerHTML="";
+ words.slice(0,8).forEach(w=>{
+  const row=document.createElement("div");row.className="word-row";
+  const l=document.createElement("div");const strong=document.createElement("strong");strong.textContent=w.es;const small=document.createElement("small");small.textContent=w.type;l.append(strong,small);
+  const r=document.createElement("div");r.className="translation";r.textContent=w.zh+" · "+w.en;
+  row.append(l,r);$("wordList").append(row);
+ });
+}
+$("nextButton").addEventListener("click",()=>{questionNo++;newQuestion()});
+$("directionSelect").addEventListener("change",()=>newQuestion());
+$("levelSelect").addEventListener("change",()=>newQuestion());
+$("dateLabel").textContent=new Date().toLocaleDateString("en-GB",{day:"2-digit",month:"short"})+" · DAILY PRACTICE";
+updateStats();renderWords();newQuestion();
+if("serviceWorker" in navigator && location.protocol.startsWith("http")){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}))}
+</script>
+</body>
+</html>
