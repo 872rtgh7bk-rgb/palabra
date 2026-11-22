@@ -286,7 +286,8 @@ async function newQuestion(){
  $("questionIPA").textContent=current.ipa||"";
  $("questionPOS").textContent=posLabel(current.pos);
  $("options").innerHTML="<div class='loading'>正在准备选项和查询释义…</div>";
- const poolOthers=shuffle(pool.filter(w=>w.id!==current.id)).slice(0,3);
+ const optionPool=reviewMode?words.filter(w=>w.level===current.level):pool;
+ const poolOthers=shuffle(optionPool.filter(w=>w.id!==current.id)).slice(0,3);
  const candidates=shuffle([current,...poolOthers]);
  const target=(dir==="es-zh"||dir==="zh-es")?"zh":"en";
  const meanings=await Promise.all(candidates.map(w=>translateWord(w,target)));
@@ -295,8 +296,14 @@ async function newQuestion(){
  const currentMeaning=meanings[candidates.indexOf(current)];
  if(reverse)$("questionWord").textContent=currentMeaning;
  const unavailable=v=>!v||v==="释义暂不可用"||v==="Meaning unavailable";
- const optionRows=candidates.map((w,i)=>({w,text:reverse?w.es:meanings[i]})).filter(x=>!unavailable(x.text));
- const uniqueRows=optionRows.filter((x,i,a)=>a.findIndex(y=>exactKey(y.text)===exactKey(x.text))===i);
+ const currentText=reverse?current.es:currentMeaning;
+ const uniqueRows=unavailable(currentText)?[]:[{w:current,text:currentText}];
+ const seenOptions=new Set(unavailable(currentText)?[]:[exactKey(currentText)]);
+ candidates.filter(w=>w.id!==current.id).forEach(w=>{
+  const i=candidates.indexOf(w),value=reverse?w.es:meanings[i];
+  const k=exactKey(value);
+  if(!unavailable(value)&&!seenOptions.has(k)&&uniqueRows.length<4){uniqueRows.push({w,text:value});seenOptions.add(k)}
+ });
  if(unavailable(currentMeaning)||uniqueRows.length<2){
   $("options").innerHTML="<div class='empty'>这个词暂时没有可用的双语释义，翻译服务可能达到免费额度。请稍后再试，或先在词典中查看已有资料。</div>";
   $("nextButton").disabled=false;
@@ -341,8 +348,8 @@ async function answerQuestion(selected,button,selectedMeaning){
   (current.formNote?"<div class='small'>词形说明："+escapeHtml(current.formNote)+"</div>":"")+
   "<div class='small'>答题记录：正确 "+attempt.correct+" 次 · 错误 "+attempt.wrong+" 次</div>";
  addSrsRatings(fb,current,correct);
- $("nextButton").disabled=false;
- $("progressCopy").textContent=correct?"Correct · Great work":"Review this word again";
+ $("nextButton").disabled=true;
+ $("progressCopy").textContent="选择记忆程度后进入下一题 · Rate your recall to continue";
 }
 function addSrsRatings(container,w,wasCorrect){
  const wrap=document.createElement("div");wrap.className="small";wrap.style.marginTop="12px";
@@ -357,6 +364,8 @@ function addSrsRatings(container,w,wasCorrect){
    const due=scheduleReview(w,rating);
    label.textContent="已安排下次复习："+due+"（"+text+"）";
    b.style.background="#eaf1eb";
+   $("nextButton").disabled=false;
+   $("progressCopy").textContent="已安排复习 · 可以进入下一题";
   });
   row.append(b);
  });
