@@ -48,7 +48,13 @@
     "uniqueSpanishEntries": 7000,
     "englishPreloadedGlosses": 2661,
     "chinesePreloadedGlosses": 32,
-    "spanishEnglishExamplePairs": 3976
+    "spanishEnglishExamplePairs": 3976,
+    "englishPreloadedByLevel": {
+      "A1": 79,
+      "A2": 240,
+      "B1": 674,
+      "B2": 1668
+    }
   },
   "dictionarySources": [
     {
