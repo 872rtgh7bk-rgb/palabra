@@ -196,21 +196,33 @@ async function loadVocab(){
  }
 }
 function cacheKey(es,lang){return exactKey(es)+"|"+lang}
+async function googleTranslateToChinese(text){
+ const url="https://translate.googleapis.com/translate_a/single?client=gtx&sl=es&tl=zh-CN&dt=t&q="+encodeURIComponent(text);
+ const response=await fetch(url);
+ if(!response.ok)throw new Error("在线中文翻译暂不可用");
+ const data=await response.json();
+ const translated=Array.isArray(data[0])?data[0].map(part=>part&&part[0]||"").join("").trim():"";
+ return /[\u3400-\u9fff]/.test(translated)?translated:"";
+}
 async function translateExample(w){
  if(!w.exampleEs)return "";
  if(w.exampleZh)return w.exampleZh;
  const key="example|"+exactKey(w.es);
  if(store.translationCache[key])return store.translationCache[key];
- try{
-  const url="https://api.mymemory.translated.net/get?q="+encodeURIComponent(w.exampleEs)+"&langpair="+encodeURIComponent("es|zh-CN");
-  const response=await fetch(url);
-  if(!response.ok)throw new Error("Example translation unavailable");
-  const data=await response.json();
-  if(data.responseStatus&&data.responseStatus!==200)throw new Error("Example translation unavailable");
-  const result=String(data.responseData&&data.responseData.translatedText||"").replace(/&quot;/g,'"').replace(/&#39;/g,"'").trim();
-  if(!result||!/[\u3400-\u9fff]/.test(result))throw new Error("中文例句翻译暂不可用");
-  store.translationCache[key]=result;save();return result;
- }catch(e){return ""}
+ let result="";
+ try{result=await googleTranslateToChinese(w.exampleEs)}catch(e){}
+ if(!result){
+  try{
+   const url="https://api.mymemory.translated.net/get?q="+encodeURIComponent(w.exampleEs)+"&langpair="+encodeURIComponent("es|zh-CN");
+   const response=await fetch(url);
+   if(!response.ok)throw new Error("中文例句翻译暂不可用");
+   const data=await response.json();
+   const candidate=String(data.responseData&&data.responseData.translatedText||"").replace(/&quot;/g,'"').replace(/&#39;/g,"'").trim();
+   if(data.responseStatus===200&&/[\u3400-\u9fff]/.test(candidate))result=candidate;
+  }catch(e){}
+ }
+ if(result){store.translationCache[key]=result;save();}
+ return result;
 }
 async function wiktionaryMeaning(w){
  const url="https://api.wiktapi.dev/v1/zh/word/"+encodeURIComponent(w.es)+"?lang=es";
@@ -236,14 +248,16 @@ async function translateWord(w){
  const task=(async()=>{
   let result=await wiktionaryMeaning(w);
   if(!result){
+   try{result=await googleTranslateToChinese(w.es)}catch(e){}
+  }
+  if(!result){
    try{
     const url="https://api.mymemory.translated.net/get?q="+encodeURIComponent(w.es)+"&langpair="+encodeURIComponent("es|zh-CN");
     const response=await fetch(url);
     if(!response.ok)throw new Error("中文翻译查询失败");
     const data=await response.json();
-    if(data.responseStatus&&data.responseStatus!==200)throw new Error("中文翻译服务暂不可用");
     const candidate=String(data.responseData&&data.responseData.translatedText||"").replace(/&quot;/g,'"').replace(/&#39;/g,"'").trim();
-    if(/[\u3400-\u9fff]/.test(candidate))result=candidate;
+    if(data.responseStatus===200&&/[\u3400-\u9fff]/.test(candidate))result=candidate;
    }catch(e){}
   }
   if(result){store.translationCache[key]=result;save();}
