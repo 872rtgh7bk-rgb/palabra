@@ -83,7 +83,7 @@ footer{text-align:center;color:#9ca398;font-size:10px;line-height:1.7;margin-top
    <button class="subtle" id="favoriteCurrent">☆ 收藏这个词</button>
    <button class="subtle" id="speakCurrent">🔊 听发音</button>
   </div>
-  <div class="notice">词库包含 7,000 个不重复条目，其中 3,976 个配有西语原句和英文对照。完整中英词义并非全部预先人工录入：缺少的释义和中文例句会联网按需翻译并缓存在本机。机器翻译可能有误，尤其是多义词。首次下载词库后，已缓存的词条可离线查看。</div>
+  <div class="notice">词库包含 7,000 个不重复条目，其中 3,976 个配有西语原句和英文对照。部分英文释义来自词典数据；缺少的中英释义优先查询 Wiktionary 数据，未命中时再尝试机器翻译并缓存在本机。Wiktionary 和机器翻译可能有遗漏或歧义。MyMemory 匿名免费额度有限，不能保证每天都能翻译全部查询。首次下载词库后，已缓存的词条可离线查看。</div>
  </div>
 </section>
 <section id="dictionarySection" class="section hidden">
@@ -205,11 +205,30 @@ async function translateExample(w){
   store.translationCache[key]=result;save();return result;
  }catch(e){return ""}
 }
+async function wiktionaryMeaning(w,target){
+ const edition=target==="zh"?"zh":"en";
+ const url="https://api.wiktapi.dev/v1/"+edition+"/word/"+encodeURIComponent(w.es)+"?lang=es";
+ try{
+  const response=await fetch(url);
+  if(!response.ok)throw new Error("Wiktionary lookup unavailable");
+  const data=await response.json();
+  const entries=(data.entries||[]).filter(e=>e.lang_code==="es"||(e.lang||"").toLowerCase()==="spanish");
+  const glosses=[];
+  entries.forEach(e=>(e.senses||[]).forEach(s=>(s.glosses||[]).forEach(g=>{
+   const value=String(g||"").trim();if(value&&!glosses.includes(value))glosses.push(value);
+  })));
+  return glosses.slice(0,5).join("; ");
+ }catch(e){return ""}
+}
 async function translateWord(w,target){
  const key=cacheKey(w.es,target);
  if(store.translationCache[key])return store.translationCache[key];
  if(target==="zh"&&w.zh)return w.zh;
  if(target==="en"&&w.en)return w.en;
+ const wiktionary=await wiktionaryMeaning(w,target);
+ if(wiktionary){
+  store.translationCache[key]=wiktionary;save();return wiktionary;
+ }
  let q=w.es,pair=target==="zh"?"es|zh-CN":"es|en";
  if(target==="zh"&&w.en){q=w.en;pair="en|zh-CN"}
  try{
@@ -217,6 +236,7 @@ async function translateWord(w,target){
   const response=await fetch(url);
   if(!response.ok)throw new Error("Translation service unavailable");
   const data=await response.json();
+  if(data.responseStatus&&data.responseStatus!==200)throw new Error("Translation quota or provider error");
   const result=String(data.responseData&&data.responseData.translatedText||"").replace(/&quot;/g,'"').replace(/&#39;/g,"'").trim();
   if(!result||result.toLowerCase()===q.toLowerCase()&&target==="zh")throw new Error("No translation available");
   store.translationCache[key]=result;save();return result;
